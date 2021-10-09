@@ -2,5 +2,5 @@
 An application that makes it easier to prepare for the matura exam.
 
 ## Supported platforms
-* Web
-* Android
+* [Web](https://github.com/Jeboczek/maturaguide-web)
+* [Android](https://github.com/whycody)
