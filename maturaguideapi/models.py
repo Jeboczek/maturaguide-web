@@ -12,6 +12,8 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django_resized import ResizedImageField
 
 
+
+
 class Subject(models.Model):
     id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
     name = CharField(
@@ -41,6 +43,9 @@ class QuestionCategory(models.Model):
 
     def __str__(self) -> str:
         return f"[{self.subject.name}] {self.name}"
+
+    def count_questions(self) -> int:
+        return Question.objects.filter(question_category = self).count()
 
 # QuestionTag will allow us to organize the affiliation of the question to the materials
 class QuestionTag(models.Model):
@@ -109,8 +114,33 @@ class Question(models.Model):
         blank=False,
         help_text="Rok w którym pytanie pojawiło się na egzaminie maturalnym.",
     )
+    cke_order = IntegerField(
+        null=True,
+        blank=True,
+        help_text="Numer zadania w arkuszu cke (jeżeli null to znaczy że zadanie nie pochodzi z arkusza CKE)"
+    )
     def __str__(self) -> str:
-        return f"{self.subject} ({self.year}) - f{self.header[:30]}"
+        return f"[{self.id}] {self.subject} ({self.year}) - f{self.header[:30]}"
+
+    def get_as_object(self) -> dict:
+        # TODO: Find another way to fix it
+        try:
+            img_url = self.image.url
+        except ValueError:
+            img_url = None
+
+        try:
+            audio_url = self.audio.url
+        except ValueError:
+            audio_url = None
+
+        return {
+            "id": self.id,
+            "category": self.question_category.name,
+            "content_img": img_url,
+            "audio_url": audio_url,
+            "answers": [answer.get_as_object() for answer in get_all_answers_for_question(self)]
+        }
 
 # ANSWERS
 
@@ -135,11 +165,23 @@ class AnswerTrueFalse(models.Model):
         help_text="Połączenie z pytaniem.",
     )
 
+    def __str__(self) -> str:
+        return f"[{self.id}] {self.content}"
+
+    def get_as_object(self) -> dict:
+        return {
+            "type": 1,
+            "answer_id": self.id,
+            "content": self.content,
+            "correct": self.correct,
+            "points": self.points, 
+        } 
+
 
 # Answer with a choice of A to Z (type 2)
 class AnswerAZ(models.Model):
     id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    button_content = JSONField(
+    buttons_content = JSONField(
         max_length=256, default=list, help_text="Zawartość przycisków w JSON."
     )
     correct = CharField(
@@ -160,6 +202,17 @@ class AnswerAZ(models.Model):
         help_text="Połączenie z pytaniem.",
     )
 
+    def __str__(self) -> str:
+        return f"[{self.id}] " + " ".join(self.buttons_content)
+
+    def get_as_object(self) -> dict:
+        return {
+            "type": 2,
+            "answer_id": self.id,
+            "buttons_content": self.buttons_content,
+            "correct": self.correct,
+            "points": self.points, 
+        } 
 
 # Answer with content in buttons (type 3)
 class AnswerWithContent(models.Model):
@@ -186,11 +239,22 @@ class AnswerWithContent(models.Model):
         help_text="Połączenie z pytaniem.",
     )
 
+    def __str__(self) -> str:
+        return f"[{self.id}] " + " ".join(self.buttons_content)
+
+    def get_as_object(self) -> dict:
+        return {
+            "type": 3,
+            "answer_id": self.id,
+            "buttons_content": self.buttons_content,
+            "correct": self.correct,
+            "points": self.points, 
+        } 
 
 # Answer with a choice of A to Z and content (type 4)
 class AnswerAZWithContent(models.Model):
     id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    button_content = JSONField(
+    buttons_content = JSONField(
         max_length=256, default=list, help_text="Zawartość przycisków w JSON."
     )
     content = TextField(help_text="Zawartość pytania.")
@@ -211,3 +275,22 @@ class AnswerAZWithContent(models.Model):
         null=True,
         help_text="Połączenie z pytaniem.",
     )
+
+    def __str__(self) -> str:
+        return f"[{self.id}] {self.content[:20]} " + " ".join(self.button_content)
+
+    def get_as_object(self) -> dict:
+        return {
+            "type": 4,
+            "answer_id": self.id,
+            "content": self.content,
+            "buttons_content": self.buttons_content,
+            "correct": self.correct,
+            "points": self.points, 
+        } 
+
+def get_all_answers_for_question(question : Question) -> list:
+    answers = []
+    for AnswerClass in (AnswerTrueFalse, AnswerAZ, AnswerAZWithContent, AnswerWithContent):
+        answers += AnswerClass.objects.filter(question=question)
+    return answers
