@@ -117,6 +117,13 @@ USE_L10N = True
 USE_TZ = True
 
 
+# On production don't use static folder provided by Django's.
+# Instead use Apache2 redirect.
+STATICFILES_DIRS = [
+    (Path.joinpath(BASE_DIR, "static/")),
+]
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 

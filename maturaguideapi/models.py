@@ -123,16 +123,8 @@ class Question(models.Model):
         return f"[{self.id}] {self.subject} ({self.year}) - f{self.header[:30]}"
 
     def get_as_object(self) -> dict:
-        # TODO: Find another way to fix it
-        try:
-            img_url = self.image.url
-        except ValueError:
-            img_url = None
-
-        try:
-            audio_url = self.audio.url
-        except ValueError:
-            audio_url = None
+        audio_url = None if self.audio.name == "" else self.audio.url
+        img_url = None if self.image.name == "" else self.image.url
 
         return {
             "id": self.id,
