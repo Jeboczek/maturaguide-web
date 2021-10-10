@@ -5,7 +5,9 @@ from .models import *
 
 admin.site.register(Question)
 admin.site.register(Subject)
-admin.site.register(AnswerCategory)
+admin.site.register(QuestionCategory)
+admin.site.register(QuestionTag)
+admin.site.register(Explanation)
 
 # Answers
 admin.site.register(AnswerAZ)
