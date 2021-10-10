@@ -277,7 +277,7 @@ class AnswerAZWithContent(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"[{self.id}] {self.content[:20]} " + " ".join(self.button_content)
+        return f"[{self.id}] {self.content[:20]} " + " ".join(self.buttons_content)
 
     def get_as_object(self) -> dict:
         return {
