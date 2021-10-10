@@ -36,3 +36,13 @@ class GetCategoriesPresenter(Presenter):
 
     def get_as_object(self) -> list:
         return [{"id": category.id, "name": category.name, "total_questions": category.count_questions()} for category in self.categories]
+
+class GetExplanationPresenter(Presenter):
+    def __init__(self, explanations : List[str], question_nr : int) -> None:
+        self.explanations = explanations
+        self.question_nr = question_nr
+
+    def get_as_object(self) -> dict:
+        return_dict = {}
+        [return_dict.update({f"{self.question_nr}.{i}": explanation}) for i, explanation in enumerate(self.explanations, start=1)]
+        return return_dict

@@ -1,21 +1,22 @@
-from django.shortcuts import render
+from django.db.models.base import Model
 from django.core.handlers.wsgi import WSGIRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST, require_GET 
+from django.views.decorators.http import require_GET 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from .generate_quiz import quiz_generator
 
 from .models import *
 from .data_presenter import *
 
-def get_subject_by_provided_subject_id(request : WSGIRequest) -> Subject:
-    if request.GET.get("subject_id") is None:
-        raise ValidationError("You need to provide subject_id!")
+def get_object_by_provided_object_id(request : WSGIRequest, key : str, model_class : Model) -> Model:
+    if request.GET.get(key) is None:
+        raise ValidationError(f"You need to provide {key}!")
     try:
-        subject = Subject.objects.get(id=request.GET.get("subject_id"))
-        return subject
+        object = model_class.objects.get(id=request.GET.get(key))
+        return object
     except ObjectDoesNotExist:
-        raise ValidationError("Can't find subject with provided id!")
+        raise ValidationError(f"Can't find {model_class.__name__} with provided id!")
+        
 class MaturaGuideAPIViews:
     @require_GET
     @csrf_exempt
@@ -27,7 +28,7 @@ class MaturaGuideAPIViews:
     @csrf_exempt
     def generate_quiz(request : WSGIRequest):
         try:
-            subject = get_subject_by_provided_subject_id(request)
+            subject = get_object_by_provided_object_id(request, "subject_id", Subject)
         except ValidationError as e:
             return ErrorPresenter(e.message).get_as_django_json_response(status_code=400)
 
@@ -38,14 +39,28 @@ class MaturaGuideAPIViews:
 
     @require_GET
     @csrf_exempt
-    def get_explanation():
-        return list
+    def get_explanation(request : WSGIRequest):
+        try:
+            question = get_object_by_provided_object_id(request, "question_id", Question)
+        except ValidationError as e:
+            return ErrorPresenter(e.message).get_as_django_json_response(status_code=400)
+        
+        explanations = [answer.explanation for answer in question.get_list_of_all_answers() if answer.explanation is not None]
+
+        if request.GET.get("question_nr") is None:
+            return ErrorPresenter("You need to provide question_nr").get_as_django_json_response(status_code=400)
+        else:
+            question_nr = request.GET.get("question_nr")
+
+
+        return GetExplanationPresenter(explanations, question_nr).get_as_django_json_response()
+
 
     @require_GET
     @csrf_exempt
     def get_categories(request : WSGIRequest):
         try:
-            subject = get_subject_by_provided_subject_id(request)
+            subject = get_object_by_provided_object_id(request, "subject_id", Subject)
         except ValidationError as e:
             return ErrorPresenter(e.message).get_as_django_json_response(status_code=400)
 

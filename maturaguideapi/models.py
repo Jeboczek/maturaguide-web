@@ -102,13 +102,6 @@ class Question(models.Model):
         upload_to="./static/audio/",
         help_text="Plik dźwiękowy do zadania, jeżeli null to pytanie nie będzie miało nagrania.",
     )
-    explanation = ForeignKey(
-        Explanation,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        help_text="Połączenie z wyjaśnieniami.",
-    )
     year = IntegerField(
         null=False,
         blank=False,
@@ -131,8 +124,15 @@ class Question(models.Model):
             "category": self.question_category.name,
             "content_img": img_url,
             "audio_url": audio_url,
-            "answers": [answer.get_as_object() for answer in get_all_answers_for_question(self)]
+            "answers": [answer.get_as_object() for answer in get_all_answers_for_question(self)],
+            "have_explanations": self.have_explanations()
         }
+    
+    def get_list_of_all_answers(self) -> list:
+        return get_all_answers_for_question(self)
+
+    def have_explanations(self) -> bool:
+        return any([answer.explanation is not None for answer in get_all_answers_for_question(self)])
 
 # ANSWERS
 
@@ -156,6 +156,7 @@ class AnswerTrueFalse(models.Model):
         null=True,
         help_text="Połączenie z pytaniem.",
     )
+    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
 
     def __str__(self) -> str:
         return f"[{self.id}] {self.content}"
@@ -193,6 +194,7 @@ class AnswerAZ(models.Model):
         null=True,
         help_text="Połączenie z pytaniem.",
     )
+    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
 
     def __str__(self) -> str:
         return f"[{self.id}] " + " ".join(self.buttons_content)
@@ -230,6 +232,7 @@ class AnswerWithContent(models.Model):
         null=True,
         help_text="Połączenie z pytaniem.",
     )
+    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
 
     def __str__(self) -> str:
         return f"[{self.id}] " + " ".join(self.buttons_content)
@@ -267,6 +270,7 @@ class AnswerAZWithContent(models.Model):
         null=True,
         help_text="Połączenie z pytaniem.",
     )
+    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
 
     def __str__(self) -> str:
         return f"[{self.id}] {self.content[:20]} " + " ".join(self.buttons_content)
@@ -278,7 +282,7 @@ class AnswerAZWithContent(models.Model):
             "content": self.content,
             "buttons_content": self.buttons_content,
             "correct": self.correct,
-            "points": self.points, 
+            "points": self.points,
         } 
 
 def get_all_answers_for_question(question : Question) -> list:
