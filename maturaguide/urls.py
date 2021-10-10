@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from maturaguideapi.views import MaturaGuideAPIViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # API
+    path('api/get_subjects', MaturaGuideAPIViews.get_subjects),
+    path('api/generate_quiz', MaturaGuideAPIViews.generate_quiz),
+    path('api/get_explanation', MaturaGuideAPIViews.get_explanation),
+    path('api/get_categories', MaturaGuideAPIViews.get_categories),
 ]
