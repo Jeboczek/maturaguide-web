@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('',HomePageView.show_home_view ),
+    path('o-nas/',HomePageView.show_aboutus_view ),
 
     # API
     path('api/get_subjects', MaturaGuideAPIViews.get_subjects),

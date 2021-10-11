@@ -1,6 +1,6 @@
 <nav>
-    <a href="#home">home</a>
-    <a href="#learn">ucz się</a>
-    <a href="#aboutus">o nas</a>
-    <a href="#profil">profil</a>
+    <a href="/" {% if category == "home"%}id="active"{% endif %}>home</a>
+    <a href="#learn" {% if category == "learn"%}id="active"{% endif %}>ucz się</a>
+    <a href="/o-nas" {% if category == "aboutus"%}id="active"{% endif %}>o nas</a>
+    <a href="#profil" {% if category == "profil"%}id="active"{% endif %}>profil</a>
 </nav>

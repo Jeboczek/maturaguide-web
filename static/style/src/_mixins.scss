@@ -1,3 +1,8 @@
 @mixin rounded-element {
     border-radius: 25px;
 }
+
+@mixin background-fix{
+    background-position: center;
+    background-size: cover;
+}

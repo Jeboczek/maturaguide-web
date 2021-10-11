@@ -1,0 +1,68 @@
+div.category-selector{
+    padding-top: 20px;
+    min-height: 600px;
+    width: 100vw;
+    background-color: $headerBgColor;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h1{
+        text-align: center;
+        margin-top: 0px;
+        margin-bottom: 80px;
+    }
+
+    div.category-holder{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 70%;
+
+        div.category{
+            @include rounded-element;
+            width: 200px;
+            min-height: 150px;
+            height: auto;
+            border-width: 3px;
+            border-style: solid;
+            border-color: $scrollBarText;
+
+            cursor: pointer;
+
+            margin: 20px;
+            padding: 10px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+            h1, h6{
+                text-align: center;
+                margin: 0px;
+            }
+    
+            h1{
+                font-size: 20pt;
+            }
+    
+            h6{
+                font-weight: lighter;
+                font-size: 13pt;
+            }
+
+            transition: 0.1s background-color;
+            &:hover{
+                background-color: lighten($color: $mainColor, $amount: 50%);
+            }
+        }
+    }
+
+
+}
+

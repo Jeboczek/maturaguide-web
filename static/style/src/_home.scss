@@ -76,6 +76,14 @@ section{
 }
 
 @media screen and (max-width: 1400px){
+    div.category-selector{
+    
+        div.category-holder{
+            width: 90%;
+        }
+    
+    }
+    
     header{
         width: 90%;
     }
@@ -86,6 +94,15 @@ section{
 }
 
 @media screen and (max-width: 1400px){
+    div.category-selector{
+    
+        div.category-holder{
+            width: 80%;
+        }
+    
+    }
+    
+    
     header{
         width: 80%;
     }
@@ -96,6 +113,19 @@ section{
 }
 
 @media screen and (max-width: 1150px){
+    section{
+        text-align: center;
+    }
+
+    div.category-selector{
+    
+        div.category-holder{
+            width: 98%;
+        }
+    
+    }
+    
+
     header{
         width: 98%;
 

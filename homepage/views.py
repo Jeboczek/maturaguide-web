@@ -8,5 +8,13 @@ class HomePageView:
         context = {
             "range": range(50),
             "title": "Matura Guide",
+            "category": "home",
         }
         return render(request, "home.html", context)
+
+    def show_aboutus_view(request : WSGIRequest):
+        context = {
+            "title": "O nas - Matura Guide",
+            "category": "aboutus",
+        }
+        return render(request, "aboutus.html", context)
