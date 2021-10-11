@@ -5,6 +5,10 @@
 /static/img/question
 /static/audio
 
+# SASS generated files
+style.css 
+style.css.map
+
 ### Django ###
 *.log
 *.pot
