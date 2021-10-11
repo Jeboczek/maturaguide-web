@@ -5,4 +5,7 @@ from django.core.handlers.wsgi import WSGIRequest
 
 class HomePageView:
     def show_home_view(request : WSGIRequest):
-        return render(request, "home.html")
+        context = {
+            "range": range(50)
+        }
+        return render(request, "home.html", context)

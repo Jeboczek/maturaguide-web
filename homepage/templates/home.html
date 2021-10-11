@@ -3,7 +3,7 @@
 {% block content %}
 <header>
     <div id="left-header-panel">
-        <h1>Przygotuj się do matury z <span id="maincolor">Matura guide.</span></h1>
+        <h1>Przygotuj się<br> do matury z <br><span id="maincolor">Matura guide.</span></h1>
         <p>
             oprogramowaniem stworzonym przez maturzystów dla maturzystów️
         </p>
@@ -12,4 +12,15 @@
         <img src="/static/img/teacher.png" alt="Teacher image">
     </div>
 </header>
+<div class="m-scroll">
+    <div class="m-scroll__title">
+      <div>
+        <h1>
+          {% for x in range %}
+          Matura Guide
+          {% endfor %}
+        </h1>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
