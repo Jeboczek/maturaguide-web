@@ -1,3 +1,11 @@
+function updateNavHighlight(action) {
+    console.log("Updating!")
+}
+
+function bindAllActions() {
+    $(window).scroll(updateNavHighlight);
+}
+
 (() => {
-    console.log("main.js initialized.")
+    bindAllActions();
 })()

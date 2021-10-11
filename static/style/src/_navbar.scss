@@ -7,17 +7,23 @@ nav {
     height: 50px;
     width: 100%;
 
-    padding: 20px 0px;
+    padding: 60px 0px;
 
     a{
         text-decoration: none;
         color: $headerColor;
-        margin: 0px 40px;
-        font-size: 16pt;
+        margin: 0px 35px;
+        padding: 5px 10px;
+        font-size: 14pt;
 
         &#active{
             color: $mainColor;
             font-weight: bold;
+        }
+
+        &:hover{
+            background-color: $mainColorLighter;
+            border-radius: 5px;
         }
     }
 

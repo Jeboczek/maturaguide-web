@@ -1,0 +1,100 @@
+@mixin header-panel {
+    padding: 20px 50px;
+    width: 50%;
+    height: 100%
+}
+
+header{
+    @include rounded-element;
+    
+    width: 70%;
+    height: 400px;
+    background-color: $headerBgColor;
+    margin: auto;
+    margin-top: 35px;
+
+    display: flex;
+    flex-direction: row;
+
+    h1{
+        font-size: 30pt;
+        margin-bottom: 10px;
+        margin-top: 0px;
+    }
+
+    p{
+        font-size: 14pt;
+        margin: 0px;
+    }
+
+    div#left-header-panel{
+        @include header-panel;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 40%;
+    }
+
+    div#right-header-panel{
+        @include header-panel;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 60%;
+        padding-bottom: 0;
+
+        img{
+            height: 110%;
+            position: relative;
+            left: 50%;  
+            top: 100%;
+            transform: translate(-50%, -100%);
+        }
+    }
+}
+
+@media screen and (max-width: 1400px){
+    header{
+        width: 90%;
+    }
+}
+
+@media screen and (max-width: 1100px){
+    header{
+        width: 98%;
+
+        height: auto;
+        
+        flex-direction: column-reverse;
+        
+
+        div#right-header-panel { 
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-align: center;
+            img { 
+                height: 100%;
+                width: 90%;
+                position: unset;
+                transform: unset;
+                max-width: 700px;
+            }
+        }
+
+        div#left-header-panel{
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-align: center;
+
+            h1{
+                font-size: 25pt;
+            }
+
+        }
+    }
+
+
+}
