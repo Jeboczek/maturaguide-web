@@ -16,9 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from maturaguideapi.views import MaturaGuideAPIViews
+from homepage.views import HomePageView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('',HomePageView.show_home_view ),
 
     # API
     path('api/get_subjects', MaturaGuideAPIViews.get_subjects),
