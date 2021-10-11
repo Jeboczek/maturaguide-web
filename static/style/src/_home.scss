@@ -24,8 +24,9 @@ header{
     }
 
     p{
-        font-size: 14pt;
+        font-size: 16pt;
         margin: 0px;
+        line-height: 1.6;
     }
 
     div#left-header-panel{
@@ -55,14 +56,41 @@ header{
     }
 }
 
+section{
+    width: 70%;
+    margin: auto;
+    margin-top: 60px;
+
+    h2{
+        font-size: 20pt;
+        color: $mainColor;
+        margin-bottom: 30px;
+    }
+
+    p{
+        width: 80%;
+        margin: auto;
+        font-size: 15pt;
+        line-height: 2;
+    }
+}
+
 @media screen and (max-width: 1400px){
     header{
+        width: 90%;
+    }
+
+    section{
         width: 90%;
     }
 }
 
 @media screen and (max-width: 1400px){
     header{
+        width: 80%;
+    }
+
+    section{
         width: 80%;
     }
 }
@@ -101,6 +129,10 @@ header{
             }
 
         }
+    }
+
+    section{
+        width: 98%;
     }
 
 
