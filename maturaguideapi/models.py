@@ -1,3 +1,4 @@
+from typing import List
 from django.db import models
 from django.db.models.fields import (
     AutoField,
@@ -14,22 +15,6 @@ from django_resized import ResizedImageField
 
 
 
-class Subject(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    name = CharField(
-        max_length=128,
-        blank=False,
-        null=False,
-        help_text="Nazwa przedmiotu np. Matematyka",
-    )
-
-    def __str__(self) -> str:
-        return self.name
-
-    def count_questions(self):
-        return Question.objects.filter(subject=self).count()
-
-
 # QuestionCategory will allow us to organize questions by type.
 class QuestionCategory(models.Model):
     id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
@@ -39,10 +24,9 @@ class QuestionCategory(models.Model):
         null=False,
         help_text="Nazwa kategori np. Słuchanie",
     )
-    subject = ForeignKey(Subject, on_delete=models.CASCADE, help_text="Przedmiot")
 
     def __str__(self) -> str:
-        return f"[{self.subject.name}] {self.name}"
+        return f"{self.name}"
 
     def count_questions(self) -> int:
         return Question.objects.filter(question_category = self).count()
@@ -56,15 +40,27 @@ class QuestionTag(models.Model):
         blank=False,
         help_text="Nazwa tagu np. Jedzenie słownictwo",
     )
-    subject = ForeignKey(
-        Subject,
-        on_delete=models.CASCADE,
-        null=False,
-        blank=False,
-        help_text="Przedmiot",
-    )
     def __str__(self) -> str:
-        return f"[{self.subject.name}] {self.name}"
+        return f"{self.name}"
+
+class Subject(models.Model):
+    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
+    name = CharField(
+        max_length=128,
+        blank=False,
+        null=False,
+        help_text="Nazwa przedmiotu np. Matematyka",
+    )
+    subject_type = CharField(max_length=20, blank=False, null=False, help_text="Typ przedmiotu rozserzony, podstawowy")
+
+    def get_categories(self) -> List[QuestionCategory]:
+        return set([question.question_category for question in Question.objects.filter(subject=self)])
+
+    def __str__(self) -> str:
+        return self.name
+
+    def count_questions(self):
+        return Question.objects.filter(subject=self).count()
 
 class Explanation(models.Model):
     id = AutoField(primary_key=True, unique=True, null=False, db_index=True)

@@ -64,5 +64,5 @@ class MaturaGuideAPIViews:
         except ValidationError as e:
             return ErrorPresenter(e.message).get_as_django_json_response(status_code=400)
 
-        categories = QuestionCategory.objects.filter(subject = subject)
+        categories = subject.get_categories()
         return GetCategoriesPresenter(categories).get_as_django_json_response()
