@@ -44,6 +44,8 @@ class QuestionTag(models.Model):
         return f"{self.name}"
 
 class Subject(models.Model):
+    BASIC = "P"
+    EXTENDED = "R"
     id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
     name = CharField(
         max_length=128,
@@ -51,7 +53,12 @@ class Subject(models.Model):
         null=False,
         help_text="Nazwa przedmiotu np. Matematyka",
     )
-    subject_type = CharField(max_length=20, blank=False, null=False, help_text="Typ przedmiotu rozserzony, podstawowy")
+    subject_type = CharField(
+        max_length=1,
+        choices=[(BASIC, "Podstawowy"), (EXTENDED, "Rozserzony")],
+        blank=False,
+        null=False,
+        help_text="Typ przedmiotu rozserzony, podstawowy")
 
     def get_categories(self) -> List[QuestionCategory]:
         return set([question.question_category for question in Question.objects.filter(subject=self)])

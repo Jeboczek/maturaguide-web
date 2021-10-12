@@ -26,6 +26,7 @@ class MaturaGuideAPIViews:
     
     @require_GET
     @csrf_exempt
+    # TODO: Give type in question model
     def generate_quiz(request : WSGIRequest):
         try:
             subject = get_object_by_provided_object_id(request, "subject_id", Subject)
