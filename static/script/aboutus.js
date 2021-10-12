@@ -15,9 +15,9 @@ function onAvatarClick(event) {
         $(`div.avatar#${clickedPerson}`).addClass("active")
         // Change content
         let content = $("div.about-us-content");
-        content.fadeOut(400, () => {
+        content.fadeOut(200, () => {
             content.html(BIO[clickedPerson]);
-            content.fadeIn(400); 
+            content.fadeIn(200); 
         });        
     }
 }

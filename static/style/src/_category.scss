@@ -1,7 +1,7 @@
 div.category-selector{
     padding-top: 20px;
     min-height: 600px;
-    width: 100vw;
+    width: 100%;
     background-color: $headerBgColor;
 
     display: flex;
@@ -30,7 +30,8 @@ div.category-selector{
             height: auto;
             border-width: 3px;
             border-style: solid;
-            border-color: $scrollBarText;
+            border-color: $HColor;
+            opacity: 0.4;
 
             cursor: pointer;
 
@@ -41,6 +42,15 @@ div.category-selector{
             flex-direction: column;
             align-items: center;
             justify-content: center;
+
+            &#active{
+                opacity: 1;
+                border-color: $scrollBarText;
+
+                h1, h6{
+                    color: $scrollBarText;
+                }
+            }
             
             h1, h6{
                 text-align: center;
@@ -49,10 +59,11 @@ div.category-selector{
     
             h1{
                 font-size: 20pt;
+                font-weight: 500;
             }
     
             h6{
-                font-weight: lighter;
+                font-weight: 300;
                 font-size: 13pt;
             }
 

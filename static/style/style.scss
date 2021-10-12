@@ -7,11 +7,16 @@
 @import 'src/infscroll';
 @import 'src/category';
 @import 'src/aboutus';
+@import 'src/footer';
 
 *{
     font-family: $fontFamily;
     color: $fontColor;
     box-sizing: border-box;
+}
+
+main{
+    width: 100vw;
 }
 
 h1, h2, h3, h4, h5, h6{
@@ -21,6 +26,11 @@ h1, h2, h3, h4, h5, h6{
 body{
     margin: 0;
     padding: 0;
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
 
     background-color: $bgColor;
 }
