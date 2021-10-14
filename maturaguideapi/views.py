@@ -35,25 +35,6 @@ class MaturaGuideAPIViews:
         year = 0 if request.GET.get("year") is None else request.GET.get("year")
 
         return JsonResponse(quiz_generator(excercise, year), safe=False)
-        
-
-    @require_GET
-    @csrf_exempt
-    def get_explanation(request : WSGIRequest):
-        try:
-            question = get_object_by_provided_object_id(request, "question_id", Question)
-        except ValidationError as e:
-            return ErrorPresenter(e.message).get_as_django_json_response(status_code=400)
-        
-        explanations = [answer.explanation for answer in question.get_list_of_all_answers() if answer.explanation is not None]
-
-        if request.GET.get("question_nr") is None:
-            return ErrorPresenter("You need to provide question_nr").get_as_django_json_response(status_code=400)
-        else:
-            question_nr = request.GET.get("question_nr")
-
-
-        return GetExplanationPresenter(explanations, question_nr).get_as_django_json_response()
 
 
     @require_GET
