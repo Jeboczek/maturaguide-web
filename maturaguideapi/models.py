@@ -2,46 +2,14 @@ from typing import List
 from django.db import models
 from django.db.models.fields import (
     AutoField,
-    BooleanField,
     CharField,
-    IntegerField,
+    SmallIntegerField,
     TextField,
 )
 from django.db.models.fields.files import FileField
 from django.db.models.fields.json import JSONField
-from django.db.models.fields.related import ForeignKey, ManyToManyField
+from django.db.models.fields.related import ForeignKey
 from django_resized import ResizedImageField
-
-
-
-
-# QuestionCategory will allow us to organize questions by type.
-class QuestionCategory(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    name = CharField(
-        max_length=128,
-        blank=False,
-        null=False,
-        help_text="Nazwa kategori np. Słuchanie",
-    )
-
-    def __str__(self) -> str:
-        return f"{self.name}"
-
-    def count_questions(self) -> int:
-        return Question.objects.filter(question_category = self).count()
-
-# QuestionTag will allow us to organize the affiliation of the question to the materials
-class QuestionTag(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    name = CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-        help_text="Nazwa tagu np. Jedzenie słownictwo",
-    )
-    def __str__(self) -> str:
-        return f"{self.name}"
 
 class Subject(models.Model):
     BASIC = "P"
@@ -58,38 +26,53 @@ class Subject(models.Model):
         choices=[(BASIC, "Podstawowy"), (EXTENDED, "Rozserzony")],
         blank=False,
         null=False,
-        help_text="Typ przedmiotu rozserzony, podstawowy")
+        help_text="Typ przedmiotu rozserzony, podstawowy",
+    )
 
-    def get_categories(self) -> List[QuestionCategory]:
-        return set([question.question_category for question in Question.objects.filter(subject=self)])
+    def get_categories(self) -> list:
+        return QuestionCategory.objects.filter(subject=self)
 
     def __str__(self) -> str:
-        return self.name
+        return f"[{self.id}] {self.subject_type}{self.name}"
 
-    def count_questions(self):
-        return Question.objects.filter(subject=self).count()
+class QuestionCategory(models.Model):
+    id = AutoField(primary_key=True, null=False, blank=False)
+    name = CharField(max_length=128, null=False, blank=False)
+    subject = ForeignKey(Subject, on_delete=models.CASCADE)
 
-class Explanation(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    content = JSONField(
-        null=False,
-        blank=False,
-        default=list,
-        help_text="Wyjasnienia do zadań w postaci listy.",
-    )
+    def __str__(self) -> str:
+        return f"[{self.id}] - {self.name}"
 
 
 class Question(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    header = TextField(
-        blank=False,
-        null=False,
-        help_text="Poczatek zadania który będzie wyświetlony grubą czcionką.",
+    id = AutoField(primary_key=True, null=False, blank=False)
+    category = ForeignKey(
+        QuestionCategory, on_delete=models.CASCADE
     )
-    content = TextField(blank=False, null=False, help_text="Zawartość zadania.")
-    subject = ForeignKey(Subject, on_delete=models.CASCADE, help_text="Przedmiot")
-    question_category = ForeignKey(QuestionCategory, on_delete=models.SET_NULL, null=True, help_text="Kategoria pytania.")
-    question_tags = ManyToManyField(QuestionTag, help_text="Tagi pytania.")
+    content = TextField()
+    cke_year = SmallIntegerField(null=True)
+    cke_order = SmallIntegerField(null=True)
+
+    def __str__(self) -> str:
+        return f"[{self.id}] {self.content[:20]}"
+
+    def get_as_object(self, question_nr = "") -> dict:
+        return {
+           "id": self.id,
+           "category": self.category.name,
+           "title": f"Zadanie {question_nr}",
+           "content": self.content,
+           "excercise": self.excercise.get_as_object()
+        }
+
+class Excercise(models.Model):
+    id = AutoField(primary_key=True, null=False, blank=False)
+    audio = FileField(
+        null=True,
+        blank=True,
+        upload_to="./static/audio/",
+        help_text="Plik dźwiękowy do zadania, jeżeli null to pytanie nie będzie miało nagrania.",
+    )
     image = ResizedImageField(
         quality=75,
         upload_to="./static/img/question/",
@@ -99,197 +82,102 @@ class Question(models.Model):
         blank=True,
         help_text="Dodatkowy obrazek do zadania, jeżeli null to pytanie nie będzie miało obrazu.",
     )
-    audio = FileField(
-        null=True,
-        blank=True,
-        upload_to="./static/audio/",
-        help_text="Plik dźwiękowy do zadania, jeżeli null to pytanie nie będzie miało nagrania.",
-    )
-    year = IntegerField(
-        null=False,
-        blank=False,
-        help_text="Rok w którym pytanie pojawiło się na egzaminie maturalnym.",
-    )
-    cke_order = IntegerField(
-        null=True,
-        blank=True,
-        help_text="Numer zadania w arkuszu cke (jeżeli null to znaczy że zadanie nie pochodzi z arkusza CKE)"
-    )
+    header = TextField(default=None, null=True)
+    content = TextField(default=None, null=True)
+    footer = TextField(default=None, null=True)
+    more_text = TextField(default=None, null=True)
+    correct = CharField(max_length=1, blank=False, null=False)
+    question = ForeignKey(Question, on_delete=models.CASCADE)
+
     def __str__(self) -> str:
-        return f"[{self.id}] {self.subject} ({self.year}) - f{self.header[:30]}"
+        return f"[{self.id}]{self.header[:20]}"
 
     def get_as_object(self) -> dict:
-        audio_url = None if self.audio.name == "" else self.audio.url
-        img_url = None if self.image.name == "" else self.image.url
-
         return {
             "id": self.id,
-            "category": self.question_category.name,
-            "content_img": img_url,
-            "audio_url": audio_url,
-            "answers": [answer.get_as_object() for answer in get_all_answers_for_question(self)],
-            "have_explanations": self.have_explanations()
+            "header": self.header,
+            "content": self.content,
+            "footer": self.footer,
+            "audio": None if self.audio.name == "" else self.audio.url,
+            "img": None if self.image.name == "" else self.image.url,
+            "correct_answer": self.correct,
+            "excercise_contents": [
+                answer.get_as_object()
+                for answer in Answer.objects.filter(excercise=self)
+            ],
         }
-    
-    def get_list_of_all_answers(self) -> list:
-        return get_all_answers_for_question(self)
-
-    def have_explanations(self) -> bool:
-        return any([answer.explanation is not None for answer in get_all_answers_for_question(self)])
-
-# ANSWERS
-
-# Simple True/False answer (type 1)
-class AnswerTrueFalse(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    content = TextField(help_text="Zawartość pytania.")
-    correct = BooleanField(
-        default=False,
-        null=False,
-        help_text="Ktore pytanie jest poprawne? Jeżeli checkbox jest zaznaczony to prawidłowa jest prawda.",
-    )
-    points = IntegerField(
-        default=1,
-        null=False,
-        help_text="Punkty które użytkownik dostaje za poprawną odpowiedź.",
-    )
-    question = ForeignKey(
-        Question,
-        on_delete=models.CASCADE,
-        null=True,
-        help_text="Połączenie z pytaniem.",
-    )
-    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
-
-    def __str__(self) -> str:
-        return f"[{self.id}] {self.content}"
-
-    def get_as_object(self) -> dict:
-        return {
-            "type": 1,
-            "answer_id": self.id,
-            "content": self.content,
-            "correct": self.correct,
-            "points": self.points, 
-        } 
 
 
-# Answer with a choice of A to Z (type 2)
-class AnswerAZ(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    buttons_content = JSONField(
-        max_length=256, default=list, help_text="Zawartość przycisków w JSON."
-    )
-    correct = CharField(
-        max_length=1,
-        default="A",
-        null=False,
-        help_text="Zawartość prawidłowego buttona.",
-    )
-    points = IntegerField(
-        default=1,
-        null=False,
-        help_text="Punkty które użytkownik dostaje za poprawną odpowiedź.",
-    )
-    question = ForeignKey(
-        Question,
-        on_delete=models.CASCADE,
-        null=True,
-        help_text="Połączenie z pytaniem.",
-    )
-    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
-
-    def __str__(self) -> str:
-        return f"[{self.id}] " + " ".join(self.buttons_content)
-
-    def get_as_object(self) -> dict:
-        return {
-            "type": 2,
-            "answer_id": self.id,
-            "buttons_content": self.buttons_content,
-            "correct": self.correct,
-            "points": self.points, 
-        } 
-
-# Answer with content in buttons (type 3)
-class AnswerWithContent(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
+class Explanation(models.Model):
+    id = AutoField(primary_key=True, null=False, blank=False)
     content = TextField()
-    buttons_content = JSONField(
-        null=False,
-        blank=False,
-        default=list,
-        help_text="Teksty które będą pojawiały się koło przycisków.",
-    )
-    correct = IntegerField(
-        default=False, null=False, help_text="Indeks poprawnej odpowiedzi."
-    )
-    points = IntegerField(
-        default=1,
-        null=False,
-        help_text="Punkty które użytkownik dostaje za poprawną odpowiedź.",
-    )
-    question = ForeignKey(
-        Question,
-        on_delete=models.CASCADE,
-        null=True,
-        help_text="Połączenie z pytaniem.",
-    )
-    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
 
     def __str__(self) -> str:
-        return f"[{self.id}] " + " ".join(self.buttons_content)
+        return f"[{self.id}] {self.content[:20]}"
 
     def get_as_object(self) -> dict:
         return {
-            "type": 3,
-            "answer_id": self.id,
-            "buttons_content": self.buttons_content,
-            "correct": self.correct,
-            "points": self.points, 
-        } 
-
-# Answer with a choice of A to Z and content (type 4)
-class AnswerAZWithContent(models.Model):
-    id = AutoField(primary_key=True, unique=True, null=False, db_index=True)
-    buttons_content = JSONField(
-        max_length=256, default=list, help_text="Zawartość przycisków w JSON."
-    )
-    content = TextField(help_text="Zawartość pytania.")
-    correct = CharField(
-        max_length=1,
-        default="A",
-        null=False,
-        help_text="Zawartość prawidłowego buttona.",
-    )
-    points = IntegerField(
-        default=1,
-        null=False,
-        help_text="Punkty które użytkownik dostaje za poprawną odpowiedź.",
-    )
-    question = ForeignKey(
-        Question,
-        on_delete=models.CASCADE,
-        null=True,
-        help_text="Połączenie z pytaniem.",
-    )
-    explanation = TextField(null=True, blank=True, help_text="Wyjaśnienie do pytania")
-
-    def __str__(self) -> str:
-        return f"[{self.id}] {self.content[:20]} " + " ".join(self.buttons_content)
-
-    def get_as_object(self) -> dict:
-        return {
-            "type": 4,
-            "answer_id": self.id,
+            "id": self.id,
             "content": self.content,
-            "buttons_content": self.buttons_content,
-            "correct": self.correct,
-            "points": self.points,
-        } 
+        }
 
-def get_all_answers_for_question(question : Question) -> list:
-    answers = []
-    for AnswerClass in (AnswerTrueFalse, AnswerAZ, AnswerAZWithContent, AnswerWithContent):
-        answers += AnswerClass.objects.filter(question=question)
-    return answers
+
+class Answer(models.Model):
+    TRUEFALSE = 1
+    AZ = 2
+    BUTTONCONTENT = 3
+
+    id = AutoField(primary_key=True, null=False, blank=False)
+    question_type = models.SmallIntegerField(
+        choices=[
+            (TRUEFALSE, "Prawda, fałsz"),
+            (AZ, "Przyciski od A - Z"),
+            (BUTTONCONTENT, "Przyciski z zawartością"),
+        ]
+    )
+    button_content = JSONField(null=True, blank=True, default=list)
+    content = CharField(max_length=512, null=True, blank=True)
+    to_button = CharField(max_length=1, default="Z", null=True, blank=True)
+    excercise = ForeignKey(Excercise, on_delete=models.CASCADE, null=False, blank=False)
+    explanation = ForeignKey(Explanation, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"[{self.id}] - type {self.question_type}"
+
+    def _get_content(self, answer_nr="") -> str:
+        return answer_nr if self.content is None else f"{answer_nr} {self.content}"
+
+    def _get_answers(self) -> list:
+        if self.question_type == 1:
+            return [{"index": "T", "content": None}, {"index": "F", "content": None}]
+        elif self.question_type == 2:
+            return [
+                {"index": chr(x), "content": None}
+                for x in range(ord("A"), ord(self.to_button) + 1)
+            ]
+        elif self.question_type == 3:
+            return [
+                {"index": chr(x), "content": content}
+                for x, content in zip(
+                    range(ord("A"), ord(self.to_button) + 1), self.button_content
+                )
+            ]
+
+    def get_as_object(self, answer_nr="") -> dict:
+        return {
+            "id": self.id,
+            "content": self._get_content(answer_nr),
+            "answers": self._get_answers(),
+            "explanation": self.explanation.get_as_object(),
+        }
+
+
+class StudySource(models.Model):
+    id = AutoField(primary_key=True, null=False, blank=False)
+    header = CharField(max_length=255)
+    title = CharField(max_length=255)
+    link = CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return self.title
+
