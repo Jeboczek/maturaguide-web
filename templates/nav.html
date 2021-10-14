@@ -1,6 +1,14 @@
 <nav>
-    <a href="/" {% if category == "home"%}id="active"{% endif %}>home</a>
-    <a href="/#learn" {% if category == "learn"%}id="active"{% endif %}>ucz się</a>
-    <a href="/o-nas" {% if category == "aboutus"%}id="active"{% endif %}>o nas</a>
-    <a href="#profil" {% if category == "profil"%}id="active"{% endif %}>profil</a>
+    <img src="/static/img/responsive-btn.svg" alt="Responsive button" id="responsive-button">
+    <a class="nav-link" href="/" {% if category == "home"%}id="active"{% endif %}>home</a>
+    <a class="nav-link" href="/#learn" {% if category == "learn"%}id="active"{% endif %}>ucz się</a>
+    <a class="nav-link" href="/o-nas" {% if category == "aboutus"%}id="active"{% endif %}>o nas</a>
+    <a class="nav-link" href="#profil" {% if category == "profil"%}id="active"{% endif %}>profil</a>
 </nav>
+
+<div class="nav-menu">
+    <a class="nav-link" href="/" {% if category == "home"%}id="active"{% endif %}>home</a>
+    <a class="nav-link" href="/#learn" {% if category == "learn"%}id="active"{% endif %}>ucz się</a>
+    <a class="nav-link" href="/o-nas" {% if category == "aboutus"%}id="active"{% endif %}>o nas</a>
+    <a class="nav-link" href="#profil" {% if category == "profil"%}id="active"{% endif %}>profil</a>
+</div>

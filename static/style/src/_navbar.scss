@@ -1,32 +1,84 @@
-// TODO: Make this navbar position fixed
-// TODO: Make this navbar more responsive
 nav {
+
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
 
-    height: 50px;
+    position: fixed;
+    background-color: $bgColor;
+
+    height: $navbarHeight;
+    z-index: 100;
     width: 100%;
 
-    padding: 60px 0px;
+    padding: ($navbarHeight/2) 0px;
 
-    a{
-        text-decoration: none;
-        color: $headerColor;
-        margin: 0px 35px;
-        padding: 5px 10px;
-        font-size: 13pt;
-
-        &#active{
-            color: $mainColor;
-            font-weight: bold;
-        }
-
-        &:hover{
-            background-color: $mainColorLighter;
-            border-radius: 5px;
-        }
+    img#responsive-button{
+        display: none;
     }
 
+}
+
+div.nav-menu{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: $bgColor;
+    z-index: 99;
+    top: -100%;
+
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: $navbarHeight 20px;
+
+    a{
+        margin: 0;
+        margin-bottom: 20px;
+        font-size: 30pt;
+        
+        &:last-child{
+            margin-bottom: 0px;
+        }
+
+    }
+}
+
+a.nav-link{
+    text-decoration: none;
+    color: $headerColor;
+    margin: 0px 35px;
+    padding: 5px 10px;
+    font-size: 13pt;
+
+    &#active{
+        color: $mainColor;
+        font-weight: bold;
+    }
+
+    &:hover{
+        background-color: $mainColorLighter;
+        border-radius: 5px;
+    }
+}
+
+@media screen and (max-width: 900px){
+    nav {
+        height: $navbarHeight / 2;
+        padding: ($navbarHeight / 4) 20px;
+        justify-content: flex-start;
+
+        a{
+            display: none;
+        }
+
+        img#responsive-button{
+            display: block;
+            cursor: pointer;
+            height: $navbarHeight/3
+
+        }
+    }
+    
 }

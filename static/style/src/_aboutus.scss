@@ -54,3 +54,22 @@ div.about-us {
         }
     }
 }
+
+@media screen and (max-width: 560px){
+    div.about-us{
+        width: 98%;
+
+        p{
+            font-size: 15pt;
+        }
+
+        div.avatar-holder{
+            height: 60px;
+            div.avatar{
+                width: 60px;
+                height: 60px;
+                border-width: 5px;
+            }
+        }
+    }
+}
