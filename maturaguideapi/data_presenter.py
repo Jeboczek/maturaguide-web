@@ -28,7 +28,7 @@ class GetSubjectsPresenter(Presenter):
         self.subjects = subjects
     
     def get_as_object(self) -> list:
-        return [{"id": subject.id, "name": subject.name, "total_questions": subject.count_questions(), "type": subject.subject_type} for subject in self.subjects]
+        return [subject.get_as_object() for subject in self.subjects]
 
 class GetCategoriesPresenter(Presenter):
     def __init__(self, categories : List[QuestionCategory]) -> None:

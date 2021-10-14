@@ -26,16 +26,15 @@ class MaturaGuideAPIViews:
     
     @require_GET
     @csrf_exempt
-    # TODO: Give type in question model
     def generate_quiz(request : WSGIRequest):
         try:
-            subject = get_object_by_provided_object_id(request, "subject_id", Subject)
+            excercise = get_object_by_provided_object_id(request, "subject_id", Subject)
         except ValidationError as e:
             return ErrorPresenter(e.message).get_as_django_json_response(status_code=400)
 
         year = 0 if request.GET.get("year") is None else request.GET.get("year")
 
-        return JsonResponse(quiz_generator(subject, year), safe=False)
+        return JsonResponse(quiz_generator(excercise, year), safe=False)
         
 
     @require_GET

@@ -8,7 +8,7 @@ from django.db.models.fields import (
 )
 from django.db.models.fields.files import FileField
 from django.db.models.fields.json import JSONField
-from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django_resized import ResizedImageField
 
 class Subject(models.Model):
@@ -29,6 +29,13 @@ class Subject(models.Model):
         help_text="Typ przedmiotu rozserzony, podstawowy",
     )
 
+    def get_as_object(self) -> dict:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type": self.subject_type,
+        }
+
     def get_categories(self) -> list:
         return QuestionCategory.objects.filter(subject=self)
 
@@ -38,32 +45,10 @@ class Subject(models.Model):
 class QuestionCategory(models.Model):
     id = AutoField(primary_key=True, null=False, blank=False)
     name = CharField(max_length=128, null=False, blank=False)
-    subject = ForeignKey(Subject, on_delete=models.CASCADE)
+    subject = ManyToManyField(Subject)
 
     def __str__(self) -> str:
         return f"[{self.id}] - {self.name}"
-
-
-class Question(models.Model):
-    id = AutoField(primary_key=True, null=False, blank=False)
-    category = ForeignKey(
-        QuestionCategory, on_delete=models.CASCADE
-    )
-    content = TextField()
-    cke_year = SmallIntegerField(null=True)
-    cke_order = SmallIntegerField(null=True)
-
-    def __str__(self) -> str:
-        return f"[{self.id}] {self.content[:20]}"
-
-    def get_as_object(self, question_nr = "") -> dict:
-        return {
-           "id": self.id,
-           "category": self.category.name,
-           "title": f"Zadanie {question_nr}",
-           "content": self.content,
-           "excercise": self.excercise.get_as_object()
-        }
 
 class Excercise(models.Model):
     id = AutoField(primary_key=True, null=False, blank=False)
@@ -86,13 +71,11 @@ class Excercise(models.Model):
     content = TextField(default=None, null=True)
     footer = TextField(default=None, null=True)
     more_text = TextField(default=None, null=True)
-    correct = CharField(max_length=1, blank=False, null=False)
-    question = ForeignKey(Question, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f"[{self.id}]{self.header[:20]}"
+        return f"[{self.id}] {self.header[:50]}"
 
-    def get_as_object(self) -> dict:
+    def get_as_object(self, question_nr) -> dict:
         return {
             "id": self.id,
             "header": self.header,
@@ -100,12 +83,35 @@ class Excercise(models.Model):
             "footer": self.footer,
             "audio": None if self.audio.name == "" else self.audio.url,
             "img": None if self.image.name == "" else self.image.url,
-            "correct_answer": self.correct,
             "excercise_contents": [
-                answer.get_as_object()
-                for answer in Answer.objects.filter(excercise=self)
+                answer.get_as_object(f"{question_nr}.{x}")
+                for x, answer in enumerate(Answer.objects.filter(excercise=self), 1)
             ],
         }
+
+class Question(models.Model):
+    id = AutoField(primary_key=True, null=False, blank=False)
+    subject = ForeignKey(Subject, on_delete=models.CASCADE)
+    category = ForeignKey(
+        QuestionCategory, on_delete=models.CASCADE
+    )
+    content = TextField()
+    cke_year = SmallIntegerField(null=True, blank=True)
+    cke_order = SmallIntegerField(null=True, blank=True)
+    excercise = ForeignKey(Excercise, null=True, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"[{self.id}] {self.content[:50]}"
+
+    def get_as_object(self, question_nr = "") -> dict:
+        return {
+           "id": self.id,
+           "category": self.category.name,
+           "title": f"Zadanie {question_nr}",
+           "content": self.content,
+           "excercise": self.excercise.get_as_object(question_nr)
+        }
+
 
 
 class Explanation(models.Model):
@@ -139,7 +145,8 @@ class Answer(models.Model):
     content = CharField(max_length=512, null=True, blank=True)
     to_button = CharField(max_length=1, default="Z", null=True, blank=True)
     excercise = ForeignKey(Excercise, on_delete=models.CASCADE, null=False, blank=False)
-    explanation = ForeignKey(Explanation, on_delete=models.CASCADE)
+    explanation = ForeignKey(Explanation, on_delete=models.CASCADE, blank=True, null=True)
+    correct = CharField(max_length=1, blank=False, null=False)
 
     def __str__(self):
         return f"[{self.id}] - type {self.question_type}"
@@ -168,7 +175,8 @@ class Answer(models.Model):
             "id": self.id,
             "content": self._get_content(answer_nr),
             "answers": self._get_answers(),
-            "explanation": self.explanation.get_as_object(),
+            "explanation": None if self.explanation is None else self.explanation.get_as_object(),
+            "correct": self.correct,
         }
 
 
