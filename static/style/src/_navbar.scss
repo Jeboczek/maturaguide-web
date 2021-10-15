@@ -1,3 +1,5 @@
+@use "sass:math";
+
 nav {
 
     display: flex;
@@ -12,7 +14,7 @@ nav {
     z-index: 100;
     width: 100%;
 
-    padding: ($navbarHeight/2) 0px;
+    padding: math.div($navbarHeight, 2) 0px;
 
     img#responsive-button{
         display: none;
@@ -36,7 +38,7 @@ div.nav-menu{
     a{
         margin: 0;
         margin-bottom: 20px;
-        font-size: 30pt;
+        font-size: 20pt;
         
         &:last-child{
             margin-bottom: 0px;
@@ -66,7 +68,7 @@ a.nav-link{
 @media screen and (max-width: 900px){
     nav {
         height: 20px;
-        padding: ($navbarHeight / 3) 20px;
+        padding: math.div($navbarHeight, 3) 20px;
         justify-content: flex-start;
 
         a{
@@ -76,7 +78,7 @@ a.nav-link{
         img#responsive-button{
             display: block;
             cursor: pointer;
-            height: $navbarHeight/3;
+            height: math.div($navbarHeight, 3);
 
         }
     }

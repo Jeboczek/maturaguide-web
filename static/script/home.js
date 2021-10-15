@@ -196,13 +196,13 @@ class QuizPicker {
     setTimeout(() => {
       $("div.category-content").animate(
         { left: "0%", display: "none", left: revert ? "100%" : "-100%" },
-        "normal",
+        200,
         () => {
           updateFunction();
           $("div.category-content").css("left", revert ? "-100%" : "100%");
           $("div.category-content").animate(
             { display: "flex", left: "0%" },
-            "normal"
+            200
           );
         }
       );
