@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/get_subjects', MaturaGuideAPIViews.get_subjects),
     path('api/generate_quiz', MaturaGuideAPIViews.generate_quiz),
     path('api/get_categories', MaturaGuideAPIViews.get_categories),
+    path('api/get_cke_sheets', MaturaGuideAPIViews.get_cke_sheets),
 ]
