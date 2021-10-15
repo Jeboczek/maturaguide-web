@@ -35,7 +35,7 @@ class GetCategoriesPresenter(Presenter):
         self.categories = categories
 
     def get_as_object(self) -> list:
-        return [{"id": category.id, "name": category.name, "total_questions": category.count_questions()} for category in self.categories]
+        return [{"id": category.id, "name": category.name} for category in self.categories]
 
 class GetExplanationPresenter(Presenter):
     def __init__(self, explanations : List[str], question_nr : int) -> None:
