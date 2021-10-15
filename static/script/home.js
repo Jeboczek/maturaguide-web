@@ -47,18 +47,22 @@ class QuizPicker {
     this.pickedCategory = null;
   }
 
-  getSubjectCardHTMLFromData(data) {
-    return `<div class="category" id="${data["id"]}"><h1>${
-      data["name"]
-    }</h1><h6>${data["type"] == "P" ? "podstawowy" : "rozserzony"}</h6></div>`;
+  getCardHTMLFromData(id = undefined, content = undefined, footer = undefined) {
+    return `<div class="category" ${
+      id === undefined ? "" : 'id="' + id + '"'
+    }>${
+      content === undefined ? "" : "<h1>" + content + "</h1>"
+    }${
+      footer === undefined ? "" : "<h6>" + footer + "</h6>"
+    }</div>`;
   }
 
-  getTypeCardHTMLFromData(data) {
-    return `<div class="category" id="${data["id"]}"><h1>${
-      data["content"]
-    }</h1>${
-      data["footer"] === undefined ? "" : "<h6>" + data["footer"] + "</h6>"
-    }</div>`;
+  getSubjectCardHTMLFromData(data) {
+    return this.getCardHTMLFromData(
+      data["id"],
+      data["name"],
+      data["type"] == "P" ? "podstawowy" : "rozserzony"
+    );
   }
 
   bindButtons() {
@@ -66,42 +70,42 @@ class QuizPicker {
     let thisObj = this;
     $("div.category").click((event) => {
       let choiceId = undefined;
-      switch (thisObj.mode) {
+      switch (this.mode) {
         case 0: // Subject
-          thisObj.pickedSubject = event.currentTarget.id;
-          thisObj.mode = 1;
-          thisObj.doTransition(event.currentTarget, () => {
-            thisObj.showTypeCards(), thisObj.bindButtons();
+          this.pickedSubject = event.currentTarget.id;
+          this.mode = 1;
+          this.doTransition(event.currentTarget, () => {
+            this.showTypeCards(), this.bindButtons();
           });
           break;
         case 1: // Type
           choiceId = event.currentTarget.id;
           if (choiceId == 0) {
-            thisObj.mode = 0;
-            thisObj.pickedSubject = undefined;
-            thisObj.doTransition(
+            this.mode = 0;
+            this.pickedSubject = undefined;
+            this.doTransition(
               event.currentTarget,
               () => {
-                thisObj.showSubjectsCards().then(() => {
-                  thisObj.bindButtons();
+                this.showSubjectsCards().then(() => {
+                  this.bindButtons();
                 });
               },
               true
             );
           } else {
-            thisObj.mode = 2;
-            thisObj.pickedMode = choiceId;
+            this.mode = 2;
+            this.pickedMode = choiceId;
             if (choiceId == 1) {
               // Trening
-              thisObj.doTransition(event.currentTarget, () => {
-                thisObj.showTraningCards(thisObj.pickedSubject).then(() => {
-                  thisObj.bindButtons();
+              this.doTransition(event.currentTarget, () => {
+                this.showTraningCards(this.pickedSubject).then(() => {
+                  this.bindButtons();
                 });
               });
             } else {
-              thisObj.doTransition(event.currentTarget, () => {
-                thisObj.showSheetCards(thisObj.pickedSubject).then(() => {
-                  thisObj.bindButtons();
+              this.doTransition(event.currentTarget, () => {
+                this.showSheetCards(this.pickedSubject).then(() => {
+                  this.bindButtons();
                 });
               });
             }
@@ -110,22 +114,22 @@ class QuizPicker {
         case 2: // Exam / Category picker
           choiceId = event.currentTarget.id;
           if (choiceId == 0) {
-            thisObj.mode = 1;
-            thisObj.pickedMode = undefined;
-            thisObj.doTransition(
+            this.mode = 1;
+            this.pickedMode = undefined;
+            this.doTransition(
               event.currentTarget,
               () => {
-                thisObj.showTypeCards();
-                thisObj.bindButtons();
+                this.showTypeCards();
+                this.bindButtons();
               },
               true
             );
           } else {
-            thisObj.pickedCategory = choiceId;
-            window.location.href = `/play?subject=${thisObj.pickedSubject}&${
-              thisObj.pickedMode == 1
-                ? "category=" + thisObj.pickedCategory
-                : "cke_year=" + thisObj.pickedCategory
+            this.pickedCategory = choiceId;
+            window.location.href = `/play?subject=${this.pickedSubject}&${
+              this.pickedMode == 1
+                ? "category=" + this.pickedCategory
+                : "cke_year=" + this.pickedCategory
             }`;
           }
       }
@@ -139,26 +143,26 @@ class QuizPicker {
       { id: 1, content: "trening" },
       { id: 2, content: "arkusz" },
     ].forEach((element) => {
-      htmlToAdd += this.getTypeCardHTMLFromData(element);
+      htmlToAdd += this.getCardHTMLFromData(...Object.values(element));
     });
     $("div.category-holder").html(htmlToAdd);
     $("h1#category-header").html("Wybierz typ nauki");
   }
 
   async showTraningCards(subject_id) {
-    const getTypeCardHTMLFromData = this.getTypeCardHTMLFromData;
+    const getCardHTMLFromData = this.getCardHTMLFromData;
     return $.getJSON(
       `/api/get_categories?subject_id=${subject_id}`,
       "",
       function (data, textStatus, jqXHR) {
-        let htmlToAdd = getTypeCardHTMLFromData({ id: 0, content: "wróć" });
+        let htmlToAdd = getCardHTMLFromData(0, "wróć");
         data.forEach((element) => {
           // Reformat
           element = {
             id: element["id"],
             content: element["name"],
           };
-          htmlToAdd += getTypeCardHTMLFromData(element);
+          htmlToAdd += getCardHTMLFromData(...Object.values(element));
         });
         $("div.category-holder").html(htmlToAdd);
         $("h1#category-header").html("Wybierz kategorie");
@@ -167,19 +171,19 @@ class QuizPicker {
   }
 
   async showSheetCards(subject_id) {
-    const getTypeCardHTMLFromData = this.getTypeCardHTMLFromData;
+    const getCardHTMLFromData = this.getCardHTMLFromData;
     return $.getJSON(
       `/api/get_cke_sheets?subject_id=${subject_id}`,
       "",
       function (data, textStatus, jqXHR) {
-        let htmlToAdd = getTypeCardHTMLFromData({ id: 0, content: "wróć" });
+        let htmlToAdd = getCardHTMLFromData(0, "wróć");
         data.forEach((element) => {
           // Reformat
           element = {
             id: element,
             content: element,
           };
-          htmlToAdd += getTypeCardHTMLFromData(element);
+          htmlToAdd += getCardHTMLFromData(...Object.values(element));
         });
         $("div.category-holder").html(htmlToAdd);
         $("h1#category-header").html("Wybierz rok");
@@ -188,14 +192,14 @@ class QuizPicker {
   }
 
   async showSubjectsCards() {
-    const getSubjectCardHTMLFromData = this.getSubjectCardHTMLFromData;
+    let thisObj = this 
     return $.getJSON(
       "/api/get_subjects",
       "",
       function (data, textStatus, jqXHR) {
         let htmlToAdd = "";
         data.forEach((element) => {
-          htmlToAdd += getSubjectCardHTMLFromData(element);
+          htmlToAdd += thisObj.getSubjectCardHTMLFromData.call(thisObj, element);
         });
         $("div.category-holder").html(htmlToAdd);
         $("h1#category-header").html("Wybierz swój przedmiot");
