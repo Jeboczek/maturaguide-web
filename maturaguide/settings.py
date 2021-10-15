@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     # Matura Guide
     'maturaguideapi',
     'homepage',
+    'contact',
+    'play',
 ]
 
 MIDDLEWARE = [
