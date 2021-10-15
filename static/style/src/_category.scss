@@ -1,5 +1,5 @@
-div.category-selector{
-    padding-top: 20px;
+div.category-selector {
+    padding: 20px 20px;
     min-height: 600px;
     width: 100%;
     background-color: $headerBgColor;
@@ -8,73 +8,101 @@ div.category-selector{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    div.category-content {
 
-    h1{
-        text-align: center;
-        margin-top: 0px;
-        margin-bottom: 80px;
-    }
-
-    div.category-holder{
+        height: 100%;
+        width: 100%;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        flex-wrap: wrap;
-        width: 70%;
 
-        div.category{
-            // @include rounded-element;
-            border-radius: 17px;
-            width: 250px;
-            min-height: 150px;
-            height: auto;
-            border-width: 3px;
-            border-style: solid;
-            border-color: $HColor;
-            opacity: 0.4;
+        position: relative;
+        left: 0;
 
-            cursor: pointer;
+        h1 {
+            text-align: center;
+            margin-top: 0px;
+            margin-bottom: 80px;
 
-            margin: 20px;
-            padding: 10px;
+            &#category-header{
+                text-transform: uppercase;
+            }
+        }
 
+        div.category-holder {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
+            width: 70%;
 
-            &#active{
-                opacity: 1;
-                border-color: $scrollBarText;
+            div.category {
+                // @include rounded-element;
+                border-radius: 17px;
+                width: 250px;
+                min-height: 150px;
+                height: auto;
+                border-width: 3px;
+                border-style: solid;
+                border-color: $HColor;
+                opacity: 0.4;
 
-                h1, h6{
-                    color: $scrollBarText;
+                cursor: pointer;
+
+                margin: 20px;
+                padding: 10px;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                &#active {
+                    opacity: 1;
+                    border-color: $scrollBarText;
+
+                    h1,
+                    h6 {
+                        color: $scrollBarText;
+                    }
                 }
-            }
-            
-            h1, h6{
-                text-align: center;
-                margin: 0px;
-            }
-    
-            h1{
-                font-size: 20pt;
-                font-weight: 400;
-            }
-    
-            h6{
-                font-weight: 300;
-                font-size: 13pt;
-            }
 
-            transition: 0.1s background-color;
-            &:hover{
-                background-color: lighten($color: $mainColor, $amount: 50%);
+                h1,
+                h6 {
+                    text-align: center;
+                    margin: 0px;
+                    transition: 0.15s color;
+                    text-transform: lowercase;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                    font-weight: 400;
+                }
+
+                h6 {
+                    font-weight: 300;
+                    font-size: 13pt;
+                }
+
+                // transition: 0.1s background-color;
+                // &:hover{
+                //     background-color: lighten($color: $mainColor, $amount: 50%);
+                // }
+
+                transition: 0.15s border-color;
+                transition: 0.15s opacity;
+                &.clicked {
+                    opacity: 1;
+                    border-color: $mainColorDarker;
+                    h1,
+                    h6 {
+                        color: $mainColorDarker !important;
+                    }
+                }
             }
         }
     }
-
-
 }
-
