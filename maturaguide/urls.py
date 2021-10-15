@@ -15,14 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from contact.views import ContactView
 from maturaguideapi.views import MaturaGuideAPIViews
 from homepage.views import HomePageView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('',HomePageView.show_home_view ),
-    path('o-nas/',HomePageView.show_aboutus_view ),
+    path('', HomePageView.show_home_view ),
+    path('o-nas/', HomePageView.show_aboutus_view ),
+    path('kontakt/', ContactView.show_root),
 
     # API
     path('api/get_subjects', MaturaGuideAPIViews.get_subjects),

@@ -1,0 +1,27 @@
+{% extends 'base.html' %} {% block content %}
+
+<header id="contact-header">
+  <h1>Skontaktuj się z <span id="maincolor">nami</span></h1>
+  <p>
+    Chcesz zgłosić błąd na stronie, pomóc w rozwoju projektu bądź po prostu
+    zadać jakieś pytanie? Skontaktuj się z nami za pomocą poniższego formularza!
+  </p>
+</header>
+
+<div id="form-content">
+  <form method="post">
+    {% csrf_token %}
+    {% for form_element in form %}
+      <label for="form_element.name">{{form_element.label}}</label>
+      {{form_element}}
+      {% if form_element.errors %}
+        {% for error in form_element.errors %}
+        <p class="form-error">{{error}}</p>
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+    <input type="submit" value="Wyślij">
+  </form>
+</div>
+
+{% endblock content %}
