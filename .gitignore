@@ -4,6 +4,7 @@
 # Matura Guide
 /static/img/question
 /static/audio
+secrets.py
 
 # SASS generated files
 style.css 
