@@ -1,10 +1,3 @@
-function updateNavHighlight(action) {
-    console.log("Updating!")
-}
-
-function bindAllActions() {
-    $(window).scroll(updateNavHighlight);
-}
 
 class ResponsiveNavBar{
     constructor(){
@@ -27,13 +20,13 @@ class ResponsiveNavBar{
 
     onNavbarBtnClick(action){
         if (this.navbarShowed) {
-            this.navbarBtn.attr("src", "/static/img/responsive-btn.svg");
+            this.navbarBtn.attr("src", "/static/img/responsive-btn.png");
             this.navbarMenu.animate({top: "-100%"}, "fast", () => {
                 this.navbarMenu.css("display", "none")
             })
             this.navbarShowed = false;
         }else{
-            this.navbarBtn.attr("src", "/static/img/close.svg");
+            this.navbarBtn.attr("src", "/static/img/close.png");
             this.navbarMenu.css("display", "flex")
             this.navbarMenu.animate({top: "0%"}, "fast")
             this.navbarShowed = true;
@@ -42,6 +35,5 @@ class ResponsiveNavBar{
 }
 
 (() => {
-    bindAllActions();
     let rn = new ResponsiveNavBar()
 })()

@@ -65,8 +65,8 @@ a.nav-link{
 
 @media screen and (max-width: 900px){
     nav {
-        height: $navbarHeight / 2;
-        padding: ($navbarHeight / 4) 20px;
+        height: 20px;
+        padding: ($navbarHeight / 3) 20px;
         justify-content: flex-start;
 
         a{
@@ -76,7 +76,7 @@ a.nav-link{
         img#responsive-button{
             display: block;
             cursor: pointer;
-            height: $navbarHeight/3
+            height: $navbarHeight/3;
 
         }
     }
