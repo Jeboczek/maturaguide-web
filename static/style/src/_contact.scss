@@ -89,8 +89,12 @@ article#contact-success {
 
 @media screen and (max-width: 900px) {
     div#form-content {
-        width: 98%;
+        width: 92%;
         div.input-holder {
+            width: 100%;
+        }
+
+        input[type="submit"]{
             width: 100%;
         }
     }
