@@ -1,6 +1,6 @@
 // TODO: Create style
 
-header#contact-header{
+header#contact-header {
     background-color: unset;
     border-radius: unset;
     height: unset;
@@ -10,17 +10,70 @@ header#contact-header{
     align-items: center;
     justify-content: center;
 
-    h1:first-child{
+    h1:first-child {
         margin-bottom: 0.5em;
     }
 
-    p{
+    p {
         width: 50%;
         text-align: center;
         font-size: 15pt;
     }
 }
 
-div#form-content{
+div#form-content {
+    width: 40%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
 
+    div.input-holder {
+        width: 48%;
+
+        input,
+        label,
+        select {
+            width: 100%;
+        }
+
+        input, select, textarea, iframe[title="reCAPTCHA"]{
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        &#holder_content,
+        &#holder_captcha {
+            width: 100%;
+
+            textarea {
+                width: 100%;
+            }
+        }
+    }
+
+    input[type="submit"]{
+        margin-left: auto;
+    }
+}
+
+article#contact-success{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+
+    img{
+        width: 500px;
+    }
+    h1{
+        margin: 0;
+    }
+    p{
+        width: 20%;
+        margin-bottom: 30px;
+    }
 }

@@ -1,0 +1,39 @@
+input,
+select,
+textarea {
+    height: 45px;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: $inputColor;
+    font-size: 12pt;
+    padding: 0px 8px;
+    color: black;
+
+    // &:focus{
+    //     border-color: $mainColorDarker;
+    //     color: $mainColorDarker;
+    //     outline: none;
+    // }
+}
+
+textarea {
+    height: 300px;
+    padding: 8px;
+}
+
+button,
+input[type="submit"],
+input[type="reset"] {
+    // width: 100px;
+    padding: 10px 15px;
+    font-size: 18px;
+    color: white;
+    background-color: $buttonColor;
+    border-style: none;
+    border-radius: 10px;
+    cursor: pointer;
+
+    &:hover{
+        background-color: $mainColorDarker;
+    }
+}

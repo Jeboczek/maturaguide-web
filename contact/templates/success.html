@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block bottom_js %}
+<script src="/static/script/contact.js"></script>
+{% endblock bottom_js %}
+
+{% block content %}
+
+<article id="contact-success">
+  <img src="/static/img/sent.jpg" alt="Wiadomość wysłana" />
+  <h1>Twoja wiadomość jest już <span id="maincolor"> u nas</span></h1>
+  <p>Spodziewaj się wkrótce odpowiedzi na podany wcześniej adres e-mail!</p>
+  <button id="homepage-redirect">Strona główna</button>
+</article>
+
+{% endblock content %}

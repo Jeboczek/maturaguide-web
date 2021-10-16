@@ -8,20 +8,23 @@
   </p>
 </header>
 
+<form method="post">
 <div id="form-content">
-  <form method="post">
     {% csrf_token %}
     {% for form_element in form %}
-      <label for="form_element.name">{{form_element.label}}</label>
+    <div class="input-holder" id="holder_{{form_element.name}}">
+      <label for="id_{{form_element.name}}">{{form_element.label}}</label>
+      <br>
       {{form_element}}
       {% if form_element.errors %}
         {% for error in form_element.errors %}
         <p class="form-error">{{error}}</p>
         {% endfor %}
       {% endif %}
+    </div>
     {% endfor %}
     <input type="submit" value="Wyślij">
-  </form>
-</div>
+  </div>
+</form>
 
 {% endblock content %}
