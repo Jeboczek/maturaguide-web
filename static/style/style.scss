@@ -2,6 +2,7 @@
 
 @import 'src/variables';
 @import 'src/mixins';
+@import 'src/input';
 @import 'src/navbar';
 @import 'src/home';
 @import 'src/infscroll';
@@ -9,7 +10,7 @@
 @import 'src/aboutus';
 @import 'src/footer';
 @import 'src/contact';
-@import 'src/input';
+@import 'src/play';
 
 *{
     font-family: $fontFamily;

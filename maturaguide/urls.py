@@ -18,6 +18,7 @@ from django.urls import path
 from contact.views import ContactView
 from maturaguideapi.views import MaturaGuideAPIViews
 from homepage.views import HomePageView
+from play.views import PlayViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +27,7 @@ urlpatterns = [
     path('o-nas/', HomePageView.show_aboutus_view ),
     path('kontakt/', ContactView.show_root),
     path('kontakt/success', ContactView.show_success),
+    path('play/', PlayViews.show_root),
 
     # API
     path('api/get_subjects', MaturaGuideAPIViews.get_subjects),
