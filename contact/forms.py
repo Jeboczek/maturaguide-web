@@ -26,7 +26,7 @@ class MessageForm(forms.Form):
     
     def clean_phonenumber(self, *args, **kwargs):
         ph = self.cleaned_data.get("phonenumber")
-        if ph is None:
+        if ph is None or ph == "":
             return None
         else:
             ph = ph.replace(" ", "")

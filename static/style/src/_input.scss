@@ -36,3 +36,9 @@ input[type="reset"] {
 ::placeholder{
     opacity: 0.3;
 }
+
+p.form-error{
+    margin-top: 5px;
+    margin-bottom: 0;
+    color: red;
+}
