@@ -8,7 +8,7 @@ textarea {
     border-width: 2px;
     font-size: 12pt;
     padding: 0px 8px;
-    color: black;
+    color: $mainColorDarker;
     background-color: transparent;
 }
 
@@ -34,6 +34,7 @@ input[type="reset"] {
 }
 
 ::placeholder{
+    color: black;
     opacity: 0.3;
 }
 
