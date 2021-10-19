@@ -16,7 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 try:
-    from .secrets import GOOGLECAPTCHAKEYS, SECRET_KEY, DEBUG
+    from .secrets import GOOGLECAPTCHAKEYS, SECRET_KEY, DEBUG, DATABASES
 except ImportError:
     # Default settings
     GOOGLECAPTCHAKEYS = {"private_key": "", "site_key": ""}
