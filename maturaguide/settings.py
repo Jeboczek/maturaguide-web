@@ -12,14 +12,24 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
-try:
-    from .secrets import GOOGLECAPTCHAKEYS, SECRET_KEY
-except ImportError:
-    GOOGLECAPTCHAKEYS = {"private_key": "", "site_key": ""}
-    SECRET_KEY = 'django-insecure-329lrtpv&6=-9b3gce)w--xmk1%@j__8jterd!^cl*48mi87y4'
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+try:
+    from .secrets import GOOGLECAPTCHAKEYS, SECRET_KEY, DEBUG
+except ImportError:
+    # Default settings
+    GOOGLECAPTCHAKEYS = {"private_key": "", "site_key": ""}
+    SECRET_KEY = 'django-insecure-329lrtpv&6=-9b3gce)w--xmk1%@j__8jterd!^cl*48mi87y4'
+    DEBUG = True
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+    }
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +37,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ["*",]
 
@@ -79,17 +88,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'maturaguide.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
