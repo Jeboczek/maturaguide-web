@@ -178,8 +178,32 @@ div#play{
         }
 
         button{
-            margin-left: 100%;
+            margin-right: 100%;
         }
     }
     
+}
+
+@media screen and (max-width: 900px) {
+    div#play{
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    div#play-nav{
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    div#play-content{
+        width: 100%;
+    }
+
+    div#play-content-header{
+        padding: 25px !important;
+    }
+
+    div#play-content-article{
+        padding: 20px 25px !important;
+    }
 }
