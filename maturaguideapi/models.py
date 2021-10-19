@@ -67,10 +67,10 @@ class Excercise(models.Model):
         blank=True,
         help_text="Dodatkowy obrazek do zadania, jeżeli null to pytanie nie będzie miało obrazu.",
     )
-    header = TextField(default=None, null=True)
-    content = TextField(default=None, null=True)
-    footer = TextField(default=None, null=True)
-    more_text = TextField(default=None, null=True)
+    header = TextField(default=None, null=True, blank=True)
+    content = TextField(default=None, null=True, blank=True)
+    footer = TextField(default=None, null=True, blank=True)
+    more_text = TextField(default=None, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"[{self.id}] {self.header[:50]}"
