@@ -1,17 +1,18 @@
 from django.test import TestCase, RequestFactory
 from .views import MaturaGuideAPIViews
-from .models import Subject
+from .models import Question, QuestionCategory, Subject
 
 import json
 
 # Create your tests here.
+
 
 class TestGenerateQuiz(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.subject = Subject(name="test_subject")
         self.subject.save()
-    
+
     def test_generate_quiz_without_subject_id(self):
         request = self.factory.get("/api/generate_quiz")
         resp = MaturaGuideAPIViews.generate_quiz(request)
@@ -33,16 +34,19 @@ class TestGenerateQuiz(TestCase):
         content = json.loads(resp.content.decode("utf-8"))
         self.assertEqual(type(content), list)
 
+
 class TestSubjectApi(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
+
     def test_subject_api_without_subjects(self):
         # Delete old subjects
-        [ subject.delete() for subject in Subject.objects.all() ]
+        [subject.delete() for subject in Subject.objects.all()]
         request = self.factory.get("/api/get_subjects/")
         response = MaturaGuideAPIViews.get_subjects(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode("utf-8"), "[]")
+
     def test_subject_api_with_one_subject(self):
         sub = Subject(name="TEST", subject_type="R")
         sub.save()
@@ -54,5 +58,37 @@ class TestSubjectApi(TestCase):
         response = MaturaGuideAPIViews.get_subjects(request)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode("utf-8"), json.dumps([{"id": id, "name": "TEST", "type": "R"}]))
+        self.assertEqual(
+            response.content.decode("utf-8"),
+            json.dumps([{"id": id, "name": "TEST", "type": "R"}]),
+        )
 
+
+class TestCkeSheets(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+        self.categroy = QuestionCategory(name="TESTCATEGORY")
+        self.categroy.save()
+
+    def test_get_cke_sheets_without_questions(self):
+        sub = Subject(name="TEST", subject_type="R")
+        sub.save()
+
+        request = self.factory.get(f"/api/get_cke_sheets?subject_id={sub.id}")
+        response = MaturaGuideAPIViews.get_cke_sheets(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), "[]")
+
+    def test_get_cke_sheets_with_questions(self):
+        # Create Subject
+        sub = Subject(name="TEST", subject_type="R")
+        sub.save()
+        # Create Question
+        ques = Question(subject = sub, category = self.categroy, content = "", cke_year=1000, cke_order=1)
+        ques.save()
+
+        request = self.factory.get(f"/api/get_cke_sheets?subject_id={sub.id}")
+        response = MaturaGuideAPIViews.get_cke_sheets(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), "[1000]")
