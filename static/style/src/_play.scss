@@ -55,7 +55,7 @@ div#play{
                 li{
                     font-size: 15pt;
                     color: $HColor;
-                    margin-bottom: 15px;
+                    margin-bottom: 25px;
                     cursor: pointer;
 
                     transition: 0.2s opacity;
@@ -86,7 +86,7 @@ div#play{
             background-color: $playHeader;
             display: flex;
             flex-direction: column;
-            padding: 40px;
+            padding: 60px;
     
             h6#question-category{
                 font-size: 12pt;
@@ -102,11 +102,12 @@ div#play{
             p#question-content{
                 font-size: 18pt;
                 margin: 0;
+                line-height: 1.2;
             }
         }
 
         &-article{
-            padding: 0px 40px;
+            padding: 20px 60px;
 
             h1#exercise-header{
                 text-align: center;
@@ -119,6 +120,7 @@ div#play{
             p#exercise-content{
                 font-size: 15pt;
                 margin-top: 15px;
+                line-height: 1.5;
             }
 
             h6#exercise-footer{
@@ -163,7 +165,7 @@ div#play{
                     justify-content: center;
                     border-radius: 100%;
                     font-weight: bold;
-                    color: $darkFontSize;
+                    color: $buttonColor;
                     margin-right: 1em;
 
                     &.selected{
