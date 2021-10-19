@@ -6,7 +6,7 @@ import json
 
 # Create your tests here.
 
-class TestApiViewsValidators(TestCase):
+class TestGenerateQuiz(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.subject = Subject(name="test_subject")
@@ -32,4 +32,27 @@ class TestApiViewsValidators(TestCase):
         self.assertEqual(resp.status_code, 200)
         content = json.loads(resp.content.decode("utf-8"))
         self.assertEqual(type(content), list)
+
+class TestSubjectApi(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+    def test_subject_api_without_subjects(self):
+        # Delete old subjects
+        [ subject.delete() for subject in Subject.objects.all() ]
+        request = self.factory.get("/api/get_subjects/")
+        response = MaturaGuideAPIViews.get_subjects(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), "[]")
+    def test_subject_api_with_one_subject(self):
+        sub = Subject(name="TEST", subject_type="R")
+        sub.save()
+        # Get an ID from the newly created Subject. Because the DBMS may allocate a number other than 1.
+        id = sub.id
+        self.assertEqual(Subject.objects.count(), 1)
+
+        request = self.factory.get("/api/get_subjects/")
+        response = MaturaGuideAPIViews.get_subjects(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode("utf-8"), json.dumps([{"id": id, "name": "TEST", "type": "R"}]))
 
