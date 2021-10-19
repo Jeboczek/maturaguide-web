@@ -21,7 +21,9 @@ class MessageForm(forms.Form):
             "firstname",
             "email",
             "phonenumber",
-            "reason"
+            "reason",
+            "content",
+            "captcha"
         ]
     
     def clean_phonenumber(self, *args, **kwargs):
