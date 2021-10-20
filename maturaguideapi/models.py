@@ -153,6 +153,7 @@ class Answer(models.Model):
     )
     correct = CharField(max_length=1, blank=False, null=False)
 
+
     def __str__(self):
         return f"[{self.id}] - type {self.question_type}"
 
@@ -178,20 +179,20 @@ class Answer(models.Model):
             return [
                 {
                     "index": chr(x),
-                    "content": content,
+                    "title": title,
                     "header": header,
                     "footer": footer,
+                    "content": content
                 }
-                for x, content, header, footer in zip(
+                for x, title, header, footer, content in zip(
                     range(ord("A"), ord(self.to_button) + 1),
+                    self.title,
                     self.button_content,
                     self.header,
                     self.footer,
+                    self.content
                 )
             ]
-
-    header = CharField(max_length=512, null=True, blank=True)
-    footer = CharField(max_length=512, null=True, blank=True)
 
     def get_as_object(self, answer_nr="") -> dict:
         return {
