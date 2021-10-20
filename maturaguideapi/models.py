@@ -1,4 +1,5 @@
 from typing import List
+import re
 from django.db import models
 from django.db.models.fields import (
     AutoField,
@@ -75,6 +76,17 @@ class Excercise(models.Model):
     footer = TextField(default=None, null=True, blank=True)
     more_text = TextField(default=None, null=True, blank=True)
 
+    def _delete_newline_from_content(self, content) -> str:
+        return content.replace("\n", "").replace("\r", "")
+
+    def _format_content(self, content, question_nr) -> str:
+        splitted = re.split(r"\d\.\d\. _{5}", content)
+        if len(splitted) > 1:
+            content = ""
+            for i, chunks in enumerate(zip(splitted[::2], splitted[1::2]), start=1):
+                content += chunks[0] + f" {question_nr}.{i}. _____ " + chunks[1]
+        return content
+
     def __str__(self) -> str:
         return f"[{self.id}] {self.header[:50]}"
 
@@ -82,7 +94,7 @@ class Excercise(models.Model):
         return {
             "id": self.id,
             "header": self.header,
-            "content": self.content,
+            "content": self._format_content(self._delete_newline_from_content(self.content), question_nr),
             "footer": self.footer,
             "audio": None if self.audio.name == "" else self.audio.url,
             "img": None if self.image.name == "" else self.image.url,
