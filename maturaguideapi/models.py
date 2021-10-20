@@ -209,6 +209,7 @@ class Answer(models.Model):
     def get_as_object(self, answer_nr="") -> dict:
         return {
             "id": self.id,
+            "type": self.question_type,
             "content": self._get_content(answer_nr),
             "answers": self._get_answers(),
             "explanation": None
