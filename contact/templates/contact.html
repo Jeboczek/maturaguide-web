@@ -13,7 +13,9 @@
     {% csrf_token %}
     {% for form_element in form %}
     <div class="input-holder" id="holder_{{form_element.name}}">
+      {% if form_element.label != "Captcha" %}
       <label for="id_{{form_element.name}}">{{form_element.label}}</label>
+      {% endif %}
       <br>
       {{form_element}}
       {% if form_element.errors %}

@@ -11,6 +11,7 @@ from django.db.models.fields.json import JSONField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django_resized import ResizedImageField
 
+
 class Subject(models.Model):
     BASIC = "P"
     EXTENDED = "R"
@@ -42,6 +43,7 @@ class Subject(models.Model):
     def __str__(self) -> str:
         return f"[{self.id}] {self.subject_type}{self.name}"
 
+
 class QuestionCategory(models.Model):
     id = AutoField(primary_key=True, null=False, blank=False)
     name = CharField(max_length=128, null=False, blank=False)
@@ -49,6 +51,7 @@ class QuestionCategory(models.Model):
 
     def __str__(self) -> str:
         return f"[{self.id}] - {self.name}"
+
 
 class Excercise(models.Model):
     id = AutoField(primary_key=True, null=False, blank=False)
@@ -89,12 +92,11 @@ class Excercise(models.Model):
             ],
         }
 
+
 class Question(models.Model):
     id = AutoField(primary_key=True, null=False, blank=False)
     subject = ForeignKey(Subject, on_delete=models.CASCADE)
-    category = ForeignKey(
-        QuestionCategory, on_delete=models.CASCADE
-    )
+    category = ForeignKey(QuestionCategory, on_delete=models.CASCADE)
     content = TextField()
     cke_year = SmallIntegerField(null=True, blank=True)
     cke_order = SmallIntegerField(null=True, blank=True)
@@ -103,15 +105,14 @@ class Question(models.Model):
     def __str__(self) -> str:
         return f"[{self.id}] {self.content[:50]}"
 
-    def get_as_object(self, question_nr = "") -> dict:
+    def get_as_object(self, question_nr="") -> dict:
         return {
-           "id": self.id,
-           "category": self.category.name,
-           "title": f"Zadanie {question_nr}",
-           "content": self.content,
-           "excercise": self.excercise.get_as_object(question_nr)
+            "id": self.id,
+            "category": self.category.name,
+            "title": f"Zadanie {question_nr}",
+            "content": self.content,
+            "excercise": self.excercise.get_as_object(question_nr),
         }
-
 
 
 class Explanation(models.Model):
@@ -132,6 +133,7 @@ class Answer(models.Model):
     TRUEFALSE = 1
     AZ = 2
     BUTTONCONTENT = 3
+    TEXTANDAZ = 4
 
     id = AutoField(primary_key=True, null=False, blank=False)
     question_type = models.SmallIntegerField(
@@ -139,13 +141,16 @@ class Answer(models.Model):
             (TRUEFALSE, "Prawda, fałsz"),
             (AZ, "Przyciski od A - Z"),
             (BUTTONCONTENT, "Przyciski z zawartością"),
+            (TEXTANDAZ, "Tekst z przyciskami A - Z"),
         ]
     )
     button_content = JSONField(null=True, blank=True, default=list)
     content = CharField(max_length=512, null=True, blank=True)
     to_button = CharField(max_length=1, default="Z", null=True, blank=True)
     excercise = ForeignKey(Excercise, on_delete=models.CASCADE, null=False, blank=False)
-    explanation = ForeignKey(Explanation, on_delete=models.CASCADE, blank=True, null=True)
+    explanation = ForeignKey(
+        Explanation, on_delete=models.CASCADE, blank=True, null=True
+    )
     correct = CharField(max_length=1, blank=False, null=False)
 
     def __str__(self):
@@ -169,13 +174,33 @@ class Answer(models.Model):
                     range(ord("A"), ord(self.to_button) + 1), self.button_content
                 )
             ]
+        elif self.question_type == 4:
+            return [
+                {
+                    "index": chr(x),
+                    "content": content,
+                    "header": header,
+                    "footer": footer,
+                }
+                for x, content, header, footer in zip(
+                    range(ord("A"), ord(self.to_button) + 1),
+                    self.button_content,
+                    self.header,
+                    self.footer,
+                )
+            ]
+
+    header = CharField(max_length=512, null=True, blank=True)
+    footer = CharField(max_length=512, null=True, blank=True)
 
     def get_as_object(self, answer_nr="") -> dict:
         return {
             "id": self.id,
             "content": self._get_content(answer_nr),
             "answers": self._get_answers(),
-            "explanation": None if self.explanation is None else self.explanation.get_as_object(),
+            "explanation": None
+            if self.explanation is None
+            else self.explanation.get_as_object(),
             "correct": self.correct,
         }
 
@@ -188,4 +213,3 @@ class StudySource(models.Model):
 
     def __str__(self) -> str:
         return self.title
-
