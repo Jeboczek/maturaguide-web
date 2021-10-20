@@ -167,7 +167,7 @@ class Answer(models.Model):
 
 
     def __str__(self):
-        return f"[{self.id}] - type {self.question_type}"
+        return f"[{self.id}] - type {self.question_type} | {self.excercise}"
 
     def _get_content(self, answer_nr="") -> str:
         return answer_nr if self.content is None else f"{answer_nr} {self.content}"
