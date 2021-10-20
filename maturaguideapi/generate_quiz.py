@@ -3,7 +3,7 @@ from .models import Subject, Question
 import random
 
 
-def quiz_generator(subject : Subject, year=0, question_limit=9) -> list:
+def quiz_generator(subject : Subject, year=0, question_limit=9, question_category = None) -> list:
     """Function for generating quizzes.
     The year attribute can be set to 0 to get a randomly generated sheet."""
     if year == 0:
@@ -14,6 +14,10 @@ def quiz_generator(subject : Subject, year=0, question_limit=9) -> list:
         questions = Question.objects.filter(year=year, subject=subject)
         # Sort all question by cke_order
         questions = sorted(questions, key = lambda x: x.cke_order)
+
+    if not question_category is None:
+        questions = [question for question in questions if question.category == question_category]
+        
     
     questions = questions[:question_limit]
 

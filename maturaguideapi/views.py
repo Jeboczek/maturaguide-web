@@ -59,9 +59,19 @@ class MaturaGuideAPIViews:
                 status_code=400
             )
 
+        if not request.GET.get("category_id") is None:
+            try:
+                category = get_object_by_provided_object_id(request, "category_id", QuestionCategory)
+            except ValidationError as e:
+                return ErrorPresenter(e.message).get_as_django_json_response(
+                status_code=400
+            )
+        else:
+            category = None
+
         year = 0 if request.GET.get("year") is None else request.GET.get("year")
 
-        return JsonResponse(quiz_generator(excercise, year), safe=False)
+        return JsonResponse(quiz_generator(excercise, year, question_category = category), safe=False)
 
     @require_GET
     @csrf_exempt
