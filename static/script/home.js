@@ -48,13 +48,10 @@ class QuizPicker {
   }
 
   getCardHTMLFromData(id = undefined, content = undefined, footer = undefined) {
-    return `<div class="category" ${
-      id === undefined ? "" : 'id="' + id + '"'
-    }>${
-      content === undefined ? "" : "<h1>" + content + "</h1>"
-    }${
-      footer === undefined ? "" : "<h6>" + footer + "</h6>"
-    }</div>`;
+    return `<div class="category" ${id === undefined ? "" : 'id="' + id + '"'
+      }>${content === undefined ? "" : "<h1>" + content + "</h1>"
+      }${footer === undefined ? "" : "<h6>" + footer + "</h6>"
+      }</div>`;
   }
 
   getSubjectCardHTMLFromData(data) {
@@ -126,11 +123,10 @@ class QuizPicker {
             );
           } else {
             this.pickedCategory = choiceId;
-            window.location.href = `/play?subject=${this.pickedSubject}&${
-              this.pickedMode == 1
-                ? "category=" + this.pickedCategory
+            window.location.href = `/play?subject_id=${this.pickedSubject}&${this.pickedMode == 1
+                ? "category_id=" + this.pickedCategory
                 : "cke_year=" + this.pickedCategory
-            }`;
+              }`;
           }
       }
     });
@@ -192,7 +188,7 @@ class QuizPicker {
   }
 
   async showSubjectsCards() {
-    let thisObj = this 
+    let thisObj = this
     return $.getJSON(
       "/api/get_subjects",
       "",
@@ -212,14 +208,20 @@ class QuizPicker {
     setTimeout(() => {
       $("div.category-content").animate(
         { left: "0%", display: "none", left: revert ? "100%" : "-100%" },
-        200,
-        () => {
-          updateFunction();
-          $("div.category-content").css("left", revert ? "-100%" : "100%");
-          $("div.category-content").animate(
-            { display: "flex", left: "0%" },
-            200
-          );
+        {
+          duration: 200,
+          specialEasing: {
+            width: "linear",
+            height: "easeOutBounce"
+          },
+          complete: () => {
+            updateFunction();
+            $("div.category-content").css("left", revert ? "-100%" : "100%");
+            $("div.category-content").animate(
+              { display: "flex", left: "0%" },
+              200
+            );
+          }
         }
       );
     }, 400);
