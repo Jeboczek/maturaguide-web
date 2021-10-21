@@ -1,32 +1,31 @@
 class ExcerciseContent {
-    constructor(id = 0, content = "", answers = [], correct = "", type=1) {
-        this.id = id
+    constructor(id = 0, content = "", answers = [], correct = "", type = 1) {
+        this.id = id;
         this.content = content;
         this.answers = answers;
         this.correct = correct;
         this.type = type;
     }
 
-    fromJson(json){
-        console.log(json)
-        this.id = json["id"]
-        this.content = json["content"]
-        this.answers = json["answers"]
-        this.correct = json["correct"]
-        this.type = json["type"]
+    fromJson(json) {
+        this.id = json["id"];
+        this.content = json["content"];
+        this.answers = json["answers"];
+        this.correct = json["correct"];
+        this.type = json["type"];
     }
 
-    getContent(){
-        let html = ""
-        html += `<h1>${this.content}</h1>`
+    getContent() {
+        let html = "";
+        html += `<h1>${this.content}</h1>`;
         switch (this.type) {
             case 1:
             case 2:
                 html += "<ul>";
                 html += "<li>";
                 this.answers.forEach((ans) => {
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle">${ans.index}</div>`
-                })
+                    html += `<div id="${this.id}-${ans.index}" class="answer-circle">${ans.index}</div>`;
+                });
                 html += "</li>";
                 html += "</ul>";
                 break;
@@ -34,16 +33,16 @@ class ExcerciseContent {
                 html += "<ul>";
                 this.answers.forEach((ans) => {
                     html += "<li>";
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle">${ans.index}</div> ${ans.content}`
+                    html += `<div id="${this.id}-${ans.index}" class="answer-circle">${ans.index}</div> ${ans.content}`;
                     html += "<li>";
-                })
+                });
                 html += "</ul>";
 
                 break;
             default:
                 break;
         }
-        return html
+        return html;
     }
 }
 class Excercise {
@@ -56,7 +55,7 @@ class Excercise {
         this.excercise_contents = [];
     }
 
-    fromJson(json){
+    fromJson(json) {
         this.header = json["header"];
         this.content = json["content"];
         this.footer = json["footer"];
@@ -65,8 +64,8 @@ class Excercise {
         json["excercise_contents"].forEach((element) => {
             let excercise_content = new ExcerciseContent();
             excercise_content.fromJson(element);
-            this.excercise_contents.push(excercise_content)
-        })
+            this.excercise_contents.push(excercise_content);
+        });
     }
 
     getHeader() {
@@ -85,12 +84,20 @@ class Excercise {
 
     getContent() {
         let html = "";
-        html += this.title === undefined ? "" : `<h1 id="exercise-header">${this.title}</h1>`;
-        html += this.content === undefined ? "" : `<p id="exercise-content">${this.content.replace("\n", "<br>")}</p>`;
-        html += this.footer === undefined ? "" : `<h6 id="exercise-footer">${this.footer}</h6>`;
+        html +=
+            this.title === undefined
+                ? ""
+                : `<h1 id="exercise-header">${this.title}</h1>`;
+        html +=
+            this.content === undefined
+                ? ""
+                : `<p id="exercise-content">${this.content.replace("\n", "<br>")}</p>`;
+        html +=
+            this.footer === undefined
+                ? ""
+                : `<h6 id="exercise-footer">${this.footer}</h6>`;
 
         this.excercise_contents.forEach((ec) => {
-            console.log(ec)
             html += `<div class="answer">${ec.getContent()}</div>`;
         });
         return html;
@@ -105,7 +112,7 @@ class Question {
         this.excercise;
     }
 
-    fromJson(json){
+    fromJson(json) {
         this.title = json["title"];
         this.category = json["category"];
         this.content = json["content"];
@@ -132,32 +139,51 @@ class Play {
         this.get = this.getParams();
         this.questionArray = [];
         this.actualQuestion = 0;
-        this.makeAPIQuerry()
+        this.makeAPIQuerry();
     }
 
-    start(){
+    start() {
         this.actualQuestion = 0;
         this.refreshNavBar();
-        this.renderActualQuestion()
+        this.renderActualQuestion();
     }
 
-    renderActualQuestion(){
+    renderActualQuestion() {
         let questionToRender = this.questionArray[this.actualQuestion];
-        $("div#play-content-header").html(questionToRender.getHeader())
-        $("div#play-content-article").html(questionToRender.getContent())
+        $("div#play-content-header").html(questionToRender.getHeader());
+        $("div#play-content-article").html(questionToRender.getContent());
     }
 
-    async refreshNavBar(){
-        let html = ""
+    async refreshNavBar() {
+        let html = "";
         this.questionArray.forEach((question, i) => {
-            html += `<li id="q-${i}" style="opacity: 0">${question.title}</li>`
-        })
+            html += `<li id="q-${i}" style="opacity: 0">${question.title}</li>`;
+        });
 
-        $("ul#question-links").html(html)
+        $("ul#question-links").html(html);
+        this.attachNavButton();
 
-        for (let i = 0; i < this.questionArray.length ; i++) {
-            await $(`li#q-${i}`).animate({opacity: "0", opacity: "1"}, 50).promise()
+        for (let i = 0; i < this.questionArray.length; i++) {
+            await $(`li#q-${i}`)
+                .animate({ opacity: "0", opacity: "1" }, 50)
+                .promise();
         }
+    }
+
+    attachNavButton() {
+        $("ul#question-links li").click((action) => {
+            this.changeQuestion.call(this, action);
+        });
+    }
+
+    changeQuestion(action) {
+        let newQuestionId = action.currentTarget.id.substr(2);
+        this.actualQuestion = newQuestionId;
+
+        $("ul#question-links li.active").removeClass("active");
+        $(`ul#question-links li#q-${newQuestionId}`).addClass("active");
+
+        this.renderActualQuestion();
     }
 
     getParams() {
@@ -169,18 +195,24 @@ class Play {
         return this.GET_table;
     }
 
-    parseJsonResponse(jsonResponse, status){
+    parseJsonResponse(jsonResponse, status) {
         jsonResponse.forEach((element) => {
-            let question = new Question()
+            let question = new Question();
             question.fromJson(element);
             this.questionArray.push(question);
-        })
+        });
 
-        this.start()
+        this.start();
     }
 
     makeAPIQuerry() {
-        $.getJSON(`/api/generate_quiz${window.location.search}`, "", (jsonResponse) => {this.parseJsonResponse.call(this, jsonResponse)});
+        $.getJSON(
+            `/api/generate_quiz${window.location.search}`,
+            "",
+            (jsonResponse) => {
+                this.parseJsonResponse.call(this, jsonResponse);
+            }
+        );
     }
 }
 let pl = new Play();
