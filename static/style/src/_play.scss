@@ -131,7 +131,7 @@ div#play{
             }
 
             p#more-text{
-                font-size: 13pt;
+                font-size: 15pt;
             }
 
             div.answer{
@@ -147,6 +147,8 @@ div#play{
                 ul{
                     list-style: none;
                     padding-left: 0;
+
+                    overflow: auto;
 
                     li{
                         display: flex;
