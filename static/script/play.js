@@ -176,12 +176,16 @@ class Play {
         });
     }
 
+    highlightActiveLink(){
+        $("ul#question-links li.active").removeClass("active");
+        $(`ul#question-links li#q-${this.actualQuestion}`).addClass("active");
+    }
+
     changeQuestion(action) {
         let newQuestionId = action.currentTarget.id.substr(2);
         this.actualQuestion = newQuestionId;
 
-        $("ul#question-links li.active").removeClass("active");
-        $(`ul#question-links li#q-${newQuestionId}`).addClass("active");
+        this.highlightActiveLink();
 
         this.renderActualQuestion();
     }

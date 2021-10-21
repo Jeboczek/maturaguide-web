@@ -83,8 +83,10 @@ class Excercise(models.Model):
         splitted = re.split(r"\d\.\d\. _{5}", content)
         if len(splitted) > 1:
             content = ""
-            for i, chunks in enumerate(zip(splitted[::2], splitted[1::2]), start=1):
-                content += chunks[0] + f" {question_nr}.{i}. _____ " + chunks[1]
+            for i, o in enumerate(splitted):
+                content += o
+                if i >= 0 and i < len(splitted)-1:
+                    content += f" {question_nr}.{i+1}. _____ "
         return content
 
     def __str__(self) -> str:
@@ -96,6 +98,7 @@ class Excercise(models.Model):
             "header": self.header,
             "content": self._format_content(self._delete_newline_from_content(self.content), question_nr),
             "footer": self.footer,
+            "more_text": self.more_text,
             "audio": None if self.audio.name == "" else self.audio.url,
             "img": None if self.image.name == "" else self.image.url,
             "excercise_contents": [
