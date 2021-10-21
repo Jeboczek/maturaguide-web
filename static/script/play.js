@@ -12,15 +12,20 @@ class ExcerciseContent {
         this.content = json["content"];
         this.answers = json["answers"];
         this.correct = json["correct"];
+        this.more_text = json["more_text"];
         this.type = json["type"];
     }
 
     getContent() {
         let html = "";
         html += `<h1>${this.content}</h1>`;
+        if (this.more_text !== null){
+            html += `<p>${this.more_text}</p>`
+        }
         switch (this.type) {
             case 1:
             case 2:
+            case 4:
                 html += "<ul>";
                 html += "<li>";
                 this.answers.forEach((ans) => {
@@ -46,10 +51,11 @@ class ExcerciseContent {
     }
 }
 class Excercise {
-    constructor(header = "", content = "", footer = "", audio = "", img = "") {
+    constructor(header = "", content = "", footer = "", more_text = "", audio = "", img = "") {
         this.header = header;
         this.content = content;
         this.footer = footer;
+        this.more_text = more_text;
         this.audio = audio;
         this.img = img;
         this.excercise_contents = [];
@@ -59,6 +65,7 @@ class Excercise {
         this.header = json["header"];
         this.content = json["content"];
         this.footer = json["footer"];
+        this.more_text = json["more_text"];
         this.audio = json["audio"];
         this.img = json["img"];
         json["excercise_contents"].forEach((element) => {
@@ -85,9 +92,9 @@ class Excercise {
     getContent() {
         let html = "";
         html +=
-            this.title === undefined
+            this.header === undefined
                 ? ""
-                : `<h1 id="exercise-header">${this.title}</h1>`;
+                : `<h1 id="exercise-header">${this.header}</h1>`;
         html +=
             this.content === undefined
                 ? ""
@@ -96,6 +103,11 @@ class Excercise {
             this.footer === undefined
                 ? ""
                 : `<h6 id="exercise-footer">${this.footer}</h6>`;
+
+        html +=
+            this.more_text === undefined
+                ? ""
+                : `<p id="more-text">${this.more_text.replace(/\n/g, "<br>")}</p>`;
 
         this.excercise_contents.forEach((ec) => {
             html += `<div class="answer">${ec.getContent()}</div>`;

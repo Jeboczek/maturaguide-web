@@ -179,7 +179,7 @@ class Answer(models.Model):
     def _get_answers(self) -> list:
         if self.question_type == 1:
             return [{"index": "T", "content": None}, {"index": "F", "content": None}]
-        elif self.question_type == 2:
+        elif self.question_type == 2 or self.question_type == 4:
             return [
                 {"index": chr(x), "content": None}
                 for x in range(ord("A"), ord(self.to_button) + 1)
@@ -189,19 +189,6 @@ class Answer(models.Model):
                 {"index": chr(x), "content": content}
                 for x, content in zip(
                     range(ord("A"), ord(self.to_button) + 1), self.button_content
-                )
-            ]
-        elif self.question_type == 4:
-            return [
-                {
-                    "index": chr(x),
-                    "more_text": more_text,
-                    "content": content,
-                }
-                for x, more_text, content in zip(
-                    range(ord("A"), ord(self.to_button) + 1),
-                    self.more_text,
-                    self.content
                 )
             ]
 
@@ -214,6 +201,7 @@ class Answer(models.Model):
             "explanation": None
             if self.explanation is None
             else self.explanation.get_as_object(),
+            "more_text": self.more_text,
             "correct": self.correct,
         }
 

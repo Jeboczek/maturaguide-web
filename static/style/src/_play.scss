@@ -130,9 +130,17 @@ div#play{
                 font-weight: normal;
             }
 
+            p#more-text{
+                font-size: 13pt;
+            }
+
             div.answer{
                 margin-bottom: 25px;
                 h1:first-child{
+                    font-size: 15pt;
+                }
+
+                p{
                     font-size: 15pt;
                 }
 
