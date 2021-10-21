@@ -161,6 +161,7 @@ class Answer(models.Model):
     )
     button_content = JSONField(null=True, blank=True, default=list)
     content = CharField(max_length=512, null=True, blank=True)
+    more_text = CharField(max_length=512, null=True, blank=True)
     to_button = CharField(max_length=1, default="Z", null=True, blank=True)
     excercise = ForeignKey(Excercise, on_delete=models.CASCADE, null=False, blank=False)
     explanation = ForeignKey(
@@ -194,17 +195,12 @@ class Answer(models.Model):
             return [
                 {
                     "index": chr(x),
-                    "title": title,
-                    "header": header,
-                    "footer": footer,
-                    "content": content
+                    "more_text": more_text,
+                    "content": content,
                 }
-                for x, title, header, footer, content in zip(
+                for x, more_text, content in zip(
                     range(ord("A"), ord(self.to_button) + 1),
-                    self.title,
-                    self.button_content,
-                    self.header,
-                    self.footer,
+                    self.more_text,
                     self.content
                 )
             ]
