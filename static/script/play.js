@@ -170,7 +170,6 @@ class PlayResult {
 
     selectAnswer(questionId, answerId, buttonIndex) {
         this.checkedAnswers[questionId][answerId] = buttonIndex;
-        console.log(this.checkedAnswers);
     }
 
 
@@ -222,7 +221,10 @@ class Play {
 
     attachAnswerButtons() {
         $("div.answer ul li").click((event) => {
-            let target =  event.target.className == "answer-circle" ? event.target : $(event.currentTarget).find("div.answer-circle")[0]
+            let target =  event.target.className == "answer-circle" ? event.target : $(event.currentTarget).find("div.answer-circle").length == 1 ? $(event.currentTarget).find("div.answer-circle")[0] : null
+            if (target === null) {
+                return
+            }
             let answerId =  parseInt(target.id.split("-")[0]);
             let newAnswer = target.id.split("-")[1];
             let oldAnswer = this.answers.getAnswer(parseInt(this.actualQuestion) + 1, answerId)
