@@ -162,6 +162,8 @@ div#play{
                         align-items: center;
                         justify-content: center;
 
+                        user-select: none;
+
                         transition: 0.25s opacity;
 
                         &:hover{
