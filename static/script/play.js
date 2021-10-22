@@ -17,9 +17,9 @@ class ExcerciseContent {
     }
 
     getContent() {
-        let html = "";
+        let html = `<div class="answer">`;
         html += `<h1>${this.content}</h1>`;
-        if (this.more_text !== null){
+        if (this.more_text !== null) {
             html += `<p>${this.more_text}</p>`
         }
         switch (this.type) {
@@ -47,6 +47,7 @@ class ExcerciseContent {
             default:
                 break;
         }
+        html += "</div>";
         return html;
     }
 }
@@ -110,7 +111,7 @@ class Excercise {
                 : `<p id="more-text">${this.more_text.replace(/\n/g, "<br>")}</p>`;
 
         this.excercise_contents.forEach((ec) => {
-            html += `<div class="answer">${ec.getContent()}</div>`;
+            html += ec.getContent();
         });
         return html;
     }
@@ -146,24 +147,55 @@ class Question {
     }
 }
 
+class PlayResult {
+    constructor() {
+        this.answerAndCorrect = {};
+        this.checkedAnswers = {};
+    }
+
+    loadAnswersFromApiJson(json) {
+        json.forEach((question) => {
+            this.answerAndCorrect[question["id"]] = {}
+            this.checkedAnswers[question["id"]] = {}
+            question["excercise"]["excercise_contents"].forEach((excerciseContent) => {
+                this.answerAndCorrect[question["id"]][excerciseContent["id"]] = excerciseContent["correct"];
+                this.checkedAnswers[question["id"]][excerciseContent["id"]] = null;
+            })
+        })
+    }
+
+    getAnswer(questionId, answerId){
+        return this.checkedAnswers[questionId][answerId];
+    }
+
+    selectAnswer(questionId, answerId, buttonIndex) {
+        this.checkedAnswers[questionId][answerId] = buttonIndex;
+        console.log(this.checkedAnswers);
+    }
+
+
+}
 class Play {
     constructor() {
         this.get = this.getParams();
         this.questionArray = [];
         this.actualQuestion = 0;
         this.makeAPIQuerry();
+        this.answers = new PlayResult()
     }
 
     start() {
         this.actualQuestion = 0;
         this.refreshNavBar();
         this.renderActualQuestion();
+        this.highlightActiveLink();
     }
 
     renderActualQuestion() {
         let questionToRender = this.questionArray[this.actualQuestion];
         $("div#play-content-header").html(questionToRender.getHeader());
         $("div#play-content-article").html(questionToRender.getContent());
+        this.attachAnswerButtons();
     }
 
     async refreshNavBar() {
@@ -188,7 +220,24 @@ class Play {
         });
     }
 
-    highlightActiveLink(){
+    attachAnswerButtons() {
+        $("div.answer ul li").click((event) => {
+            let target =  event.target.className == "answer-circle" ? event.target : $(event.currentTarget).find("div.answer-circle")[0]
+            let answerId =  parseInt(target.id.split("-")[0]);
+            let newAnswer = target.id.split("-")[1];
+            let oldAnswer = this.answers.getAnswer(parseInt(this.actualQuestion) + 1, answerId)
+
+            if (oldAnswer == newAnswer){
+                return
+            }else{
+                this.answers.selectAnswer(parseInt(this.actualQuestion) + 1, answerId, newAnswer)
+                $(event.currentTarget).parent().find(".selected").removeClass("selected")
+                $(target).addClass("selected")
+            }
+        })
+    }
+
+    highlightActiveLink() {
         $("ul#question-links li.active").removeClass("active");
         $(`ul#question-links li#q-${this.actualQuestion}`).addClass("active");
     }
@@ -212,6 +261,8 @@ class Play {
     }
 
     parseJsonResponse(jsonResponse, status) {
+        this.answers.loadAnswersFromApiJson(jsonResponse)
+
         jsonResponse.forEach((element) => {
             let question = new Question();
             question.fromJson(element);

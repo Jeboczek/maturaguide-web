@@ -132,6 +132,10 @@ class QuizPicker {
     });
   }
 
+  unBindButtons() {
+    $("div.category").unbind("click")
+  }
+
   showTypeCards() {
     let htmlToAdd = "";
     [
@@ -204,6 +208,7 @@ class QuizPicker {
   }
 
   doTransition(clicked, updateFunction, revert = false) {
+    this.unBindButtons();
     $(clicked).addClass("clicked");
     setTimeout(() => {
       $("div.category-content").animate(
