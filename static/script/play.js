@@ -97,7 +97,9 @@ class Excercise {
 
     getHeader() {
         let html = "";
-        // TODO: Fetch images
+        if (this.img !== null){
+            html += `<img class="excercise-img" src="${this.img}">`
+        }
         if (this.audio !== null) {
             html += `<div class="sound-play-holder">
                         <img src="/static/img/play.svg">

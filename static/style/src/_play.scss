@@ -104,6 +104,13 @@ div#play{
                 margin: 0;
                 line-height: 1.2;
             }
+
+            img.excercise-img{
+                width: 100%;
+                height: auto;
+                max-width: 45%;
+                margin: 20px auto;
+            }
         }
 
         &-article{
@@ -262,5 +269,11 @@ div.sound-play-holder{
 
     div#play-content-article{
         padding: 20px 25px !important;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    img.excercise-img{
+        max-width: unset !important;
     }
 }

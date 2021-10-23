@@ -18,6 +18,10 @@
     box-sizing: border-box;
 }
 
+html{
+    overflow-x: hidden;
+}
+
 main{
     width: 100vw;
     padding-top: $navbarHeight + 50px;
