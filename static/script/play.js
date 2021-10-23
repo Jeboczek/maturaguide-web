@@ -212,6 +212,11 @@ class QuestionSoundPlayer {
         this.bindAll();
     }
 
+    stop(){
+        this.audioObject.pause();
+        this.audioObject.currentTime = 0;
+    }
+
     bindAll() {
         this.bindButton();
         this.bindProgressbar();
@@ -281,6 +286,10 @@ class Play {
     }
 
     renderActualQuestion() {
+        if (this.actualQuestionSound !== undefined) {
+            this.actualQuestionSound.stop();
+            delete this.actualQuestionSound;
+        }
         let questionToRender = this.questionArray[this.actualQuestion];
         $("div#play-content-header").html(questionToRender.getHeader());
         $("div#play-content-article").html(
@@ -290,7 +299,7 @@ class Play {
         let audioFile =
             this.questionArray[this.actualQuestion]["excercise"]["audio"];
         if (audioFile !== null) {
-            let actualQuestionSound = new QuestionSoundPlayer(audioFile);
+            this.actualQuestionSound = new QuestionSoundPlayer(audioFile);
         }
         this.attachAnswerButtons();
     }
