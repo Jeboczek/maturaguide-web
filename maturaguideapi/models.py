@@ -13,6 +13,23 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django_resized import ResizedImageField
 
 
+class StudySource(models.Model):
+    id = AutoField(primary_key=True, null=False, blank=False)
+    header = CharField(max_length=255)
+    description = CharField(max_length=512)
+    link = CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return self.header
+
+    def get_as_object(self):
+        return {
+            "header": self.header,
+            "description": self.description,
+            "link": self.link,
+        }
+
+
 class Subject(models.Model):
     BASIC = "P"
     EXTENDED = "R"
@@ -75,6 +92,7 @@ class Excercise(models.Model):
     content = TextField(default=None, null=True, blank=True)
     footer = TextField(default=None, null=True, blank=True)
     more_text = TextField(default=None, null=True, blank=True)
+    study_sources = ManyToManyField(StudySource)
 
     def _delete_newline_from_content(self, content) -> str:
         return content.replace("\n", "").replace("\r", "")
@@ -85,7 +103,7 @@ class Excercise(models.Model):
             content = ""
             for i, o in enumerate(splitted):
                 content += o
-                if i >= 0 and i < len(splitted)-1:
+                if i >= 0 and i < len(splitted) - 1:
                     content += f" {question_nr}.{i+1}. _____ "
         return content
 
@@ -96,7 +114,9 @@ class Excercise(models.Model):
         return {
             "id": self.id,
             "header": self.header,
-            "content": self._format_content(self._delete_newline_from_content(self.content), question_nr),
+            "content": self._format_content(
+                self._delete_newline_from_content(self.content), question_nr
+            ),
             "footer": self.footer,
             "more_text": self.more_text,
             "audio": None if self.audio.name == "" else self.audio.url,
@@ -105,6 +125,9 @@ class Excercise(models.Model):
                 answer.get_as_object(f"{question_nr}.{x}")
                 for x, answer in enumerate(Answer.objects.filter(excercise=self), 1)
             ],
+            "study_sources": [
+                study_source.get_as_object() for study_source in self.study_sources.all()
+            ]
         }
 
 
@@ -169,7 +192,6 @@ class Answer(models.Model):
     )
     correct = CharField(max_length=1, blank=False, null=False)
 
-
     def __str__(self):
         return f"[{self.id}] - type {self.question_type} | {self.excercise}"
 
@@ -204,13 +226,3 @@ class Answer(models.Model):
             "more_text": self.more_text,
             "correct": self.correct,
         }
-
-
-class StudySource(models.Model):
-    id = AutoField(primary_key=True, null=False, blank=False)
-    header = CharField(max_length=255)
-    title = CharField(max_length=255)
-    link = CharField(max_length=255)
-
-    def __str__(self) -> str:
-        return self.title
