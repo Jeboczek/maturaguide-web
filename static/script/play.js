@@ -17,11 +17,14 @@ class ExcerciseContent {
     }
 
     getContent(answers, questionId) {
-        let checkedInThisExcercise = answers.getAnswer(parseInt(questionId), this.id);
+        let checkedInThisExcercise = answers.getAnswer(
+            parseInt(questionId),
+            this.id
+        );
         let html = `<div class="answer">`;
         html += `<h1>${this.content}</h1>`;
         if (this.more_text !== null) {
-            html += `<p>${this.more_text}</p>`
+            html += `<p>${this.more_text}</p>`;
         }
         switch (this.type) {
             case 1:
@@ -30,7 +33,11 @@ class ExcerciseContent {
                 html += "<ul>";
                 html += "<li>";
                 this.answers.forEach((ans) => {
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null && checkedInThisExcercise == ans.index ? "selected" : ""}">${ans.index}</div>`;
+                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null &&
+                            checkedInThisExcercise == ans.index
+                            ? "selected"
+                            : ""
+                        }">${ans.index}</div>`;
                 });
                 html += "</li>";
                 html += "</ul>";
@@ -39,7 +46,11 @@ class ExcerciseContent {
                 html += "<ul>";
                 this.answers.forEach((ans) => {
                     html += "<li>";
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null && checkedInThisExcercise == ans.index ? "selected" : ""}">${ans.index}</div> ${ans.content}`;
+                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null &&
+                            checkedInThisExcercise == ans.index
+                            ? "selected"
+                            : ""
+                        }">${ans.index}</div> ${ans.content}`;
                     html += "<li>";
                 });
                 html += "</ul>";
@@ -53,7 +64,14 @@ class ExcerciseContent {
     }
 }
 class Excercise {
-    constructor(header = "", content = "", footer = "", more_text = "", audio = "", img = "") {
+    constructor(
+        header = "",
+        content = "",
+        footer = "",
+        more_text = "",
+        audio = "",
+        img = ""
+    ) {
         this.header = header;
         this.content = content;
         this.footer = footer;
@@ -147,8 +165,8 @@ class Question {
 
     getContent(answers) {
         let html = this.excercise.getContent(answers, this.id);
-        html += `<button id="check-button">Sprawdź</button>`
-        return html
+        html += `<button id="check-button">Sprawdź</button>`;
+        return html;
     }
 }
 
@@ -160,21 +178,59 @@ class PlayResult {
 
     loadAnswersFromApiJson(json) {
         json.forEach((question) => {
-            this.answerAndCorrect[question["id"]] = {}
-            this.checkedAnswers[question["id"]] = {}
-            question["excercise"]["excercise_contents"].forEach((excerciseContent) => {
-                this.answerAndCorrect[question["id"]][excerciseContent["id"]] = excerciseContent["correct"];
-                this.checkedAnswers[question["id"]][excerciseContent["id"]] = null;
-            })
-        })
+            this.answerAndCorrect[question["id"]] = {};
+            this.checkedAnswers[question["id"]] = {};
+            question["excercise"]["excercise_contents"].forEach(
+                (excerciseContent) => {
+                    this.answerAndCorrect[question["id"]][excerciseContent["id"]] =
+                        excerciseContent["correct"];
+                    this.checkedAnswers[question["id"]][excerciseContent["id"]] = null;
+                }
+            );
+        });
     }
 
-    getAnswer(questionId, answerId){
+    getAnswer(questionId, answerId) {
         return this.checkedAnswers[questionId][answerId];
     }
 
     selectAnswer(questionId, answerId, buttonIndex) {
         this.checkedAnswers[questionId][answerId] = buttonIndex;
+    }
+}
+
+class QuestionSoundPlayer {
+    constructor(soundUrl) {
+        this.soundUrl = soundUrl;
+        this.progressBar = $("div.progressbar-status");
+        this.playButton = $("div.sound-play-holder img:first-child");
+        this._playImg = "/static/img/play.svg";
+        this._pauseImg = "/static/img/pause.svg";
+        this._stopped = true;
+        this.audioObject = new Audio(this.soundUrl);
+
+        this.bindButton();
+        this.bindProgressbar();
+    }
+
+    bindButton(){
+        this.playButton.click(() => {
+            if(this._stopped){
+               this.audioObject.play() 
+               this.playButton.attr("src", this._pauseImg)
+               this._stopped = false;
+            }else{
+                this.audioObject.pause()
+                this.playButton.attr("src", this._playImg)
+                this._stopped = true;
+            }
+        })
+    };
+
+    bindProgressbar(){
+        this.audioObject.addEventListener("timeupdate", (event) => {
+            this.progressBar.css("width", `${this.audioObject.currentTime/this.audioObject.duration*100}%`)
+        })
     }
 
 
@@ -185,7 +241,7 @@ class Play {
         this.questionArray = [];
         this.actualQuestion = 0;
         this.makeAPIQuerry();
-        this.answers = new PlayResult()
+        this.answers = new PlayResult();
     }
 
     start() {
@@ -198,7 +254,14 @@ class Play {
     renderActualQuestion() {
         let questionToRender = this.questionArray[this.actualQuestion];
         $("div#play-content-header").html(questionToRender.getHeader());
-        $("div#play-content-article").html(questionToRender.getContent(this.answers));
+        $("div#play-content-article").html(
+            questionToRender.getContent(this.answers)
+        );
+
+        let audioFile = this.questionArray[this.actualQuestion]["excercise"]["audio"];
+        if (audioFile !== null) {
+            let actualQuestionSound = new QuestionSoundPlayer(audioFile);
+        }
         this.attachAnswerButtons();
     }
 
@@ -226,23 +289,31 @@ class Play {
 
     attachAnswerButtons() {
         $("div.answer ul li").click((event) => {
-            let target =  event.target.className == "answer-circle " ? event.target : $(event.currentTarget).find("div.answer-circle").length == 1 ? $(event.currentTarget).find("div.answer-circle")[0] : null
+            let target =
+                event.target.className == "answer-circle "
+                    ? event.target
+                    : $(event.currentTarget).find("div.answer-circle").length == 1
+                        ? $(event.currentTarget).find("div.answer-circle")[0]
+                        : null;
             if (target === null) {
-                return
+                return;
             }
-            let questionId = this.questionArray[this.actualQuestion]["id"]
-            let answerId =  parseInt(target.id.split("-")[0]);
+            let questionId = this.questionArray[this.actualQuestion]["id"];
+            let answerId = parseInt(target.id.split("-")[0]);
             let newAnswer = target.id.split("-")[1];
-            let oldAnswer = this.answers.getAnswer(questionId, answerId)
+            let oldAnswer = this.answers.getAnswer(questionId, answerId);
 
-            if (oldAnswer == newAnswer){
-                return
-            }else{
-                this.answers.selectAnswer(questionId, answerId, newAnswer)
-                $(event.currentTarget).parent().find(".selected").removeClass("selected")
-                $(target).addClass("selected")
+            if (oldAnswer == newAnswer) {
+                return;
+            } else {
+                this.answers.selectAnswer(questionId, answerId, newAnswer);
+                $(event.currentTarget)
+                    .parent()
+                    .find(".selected")
+                    .removeClass("selected");
+                $(target).addClass("selected");
             }
-        })
+        });
     }
 
     highlightActiveLink() {
@@ -269,7 +340,7 @@ class Play {
     }
 
     parseJsonResponse(jsonResponse, status) {
-        this.answers.loadAnswersFromApiJson(jsonResponse)
+        this.answers.loadAnswersFromApiJson(jsonResponse);
 
         jsonResponse.forEach((element) => {
             let question = new Question();
