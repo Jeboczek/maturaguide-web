@@ -209,31 +209,60 @@ class QuestionSoundPlayer {
         this._stopped = true;
         this.audioObject = new Audio(this.soundUrl);
 
+        this.bindAll();
+    }
+
+    bindAll() {
         this.bindButton();
         this.bindProgressbar();
+        this.bindProgressbarClick();
+        this.bindOnEnd();
     }
 
-    bindButton(){
+    bindButton() {
         this.playButton.click(() => {
-            if(this._stopped){
-               this.audioObject.play() 
-               this.playButton.attr("src", this._pauseImg)
-               this._stopped = false;
-            }else{
-                this.audioObject.pause()
-                this.playButton.attr("src", this._playImg)
+            if (this._stopped) {
+                this.audioObject.play();
+                this.playButton.attr("src", this._pauseImg);
+                this._stopped = false;
+            } else {
+                this.audioObject.pause();
+                this.playButton.attr("src", this._playImg);
                 this._stopped = true;
             }
-        })
-    };
-
-    bindProgressbar(){
-        this.audioObject.addEventListener("timeupdate", (event) => {
-            this.progressBar.css("width", `${this.audioObject.currentTime/this.audioObject.duration*100}%`)
-        })
+        });
     }
 
+    bindProgressbar() {
+        this.audioObject.addEventListener("timeupdate", (event) => {
+            this.progressBar.css(
+                "width",
+                `${(this.audioObject.currentTime / this.audioObject.duration) * 100}%`
+            );
+        });
+    }
 
+    _calculateAudioPercent(clickEvent) {
+        let progressBarHandler = $("div.sound-play-progressbar")[0];
+        let offset = progressBarHandler.offsetLeft;
+        let progressWidth = progressBarHandler.clientWidth;
+        let clientX = clickEvent.x;
+        return ((clientX - offset) / progressWidth);
+    }
+
+    bindProgressbarClick() {
+        this.progressBar.parent().click((event) => {
+            let percent = this._calculateAudioPercent(event.originalEvent);
+            this.audioObject.currentTime = this.audioObject.duration * percent
+        });
+    }
+
+    bindOnEnd() {
+        this.audioObject.addEventListener("ended", (event) => {
+            this._stopped = true;
+            this.playButton.attr("src", this._playImg);
+         });
+    }
 }
 class Play {
     constructor() {
@@ -258,7 +287,8 @@ class Play {
             questionToRender.getContent(this.answers)
         );
 
-        let audioFile = this.questionArray[this.actualQuestion]["excercise"]["audio"];
+        let audioFile =
+            this.questionArray[this.actualQuestion]["excercise"]["audio"];
         if (audioFile !== null) {
             let actualQuestionSound = new QuestionSoundPlayer(audioFile);
         }
