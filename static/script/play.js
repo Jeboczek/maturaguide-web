@@ -146,7 +146,9 @@ class Question {
     }
 
     getContent(answers) {
-        return this.excercise.getContent(answers, this.id);
+        let html = this.excercise.getContent(answers, this.id);
+        html += `<button id="check-button">Sprawdź</button>`
+        return html
     }
 }
 

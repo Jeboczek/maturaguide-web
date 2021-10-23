@@ -71,8 +71,8 @@ class QuizPicker {
         case 0: // Subject
           this.pickedSubject = event.currentTarget.id;
           this.mode = 1;
-          this.doTransition(event.currentTarget, () => {
-            this.showTypeCards(), this.bindButtons();
+          this.doTransition(event.currentTarget, async () => {
+            return this.showTypeCards(), this.bindButtons();
           });
           break;
         case 1: // Type
@@ -82,8 +82,8 @@ class QuizPicker {
             this.pickedSubject = undefined;
             this.doTransition(
               event.currentTarget,
-              () => {
-                this.showSubjectsCards().then(() => {
+              async () => {
+                return this.showSubjectsCards().then(() => {
                   this.bindButtons();
                 });
               },
@@ -94,14 +94,14 @@ class QuizPicker {
             this.pickedMode = choiceId;
             if (choiceId == 1) {
               // Trening
-              this.doTransition(event.currentTarget, () => {
-                this.showTraningCards(this.pickedSubject).then(() => {
+              this.doTransition(event.currentTarget, async () => {
+                return this.showTraningCards(this.pickedSubject).then(() => {
                   this.bindButtons();
                 });
               });
             } else {
-              this.doTransition(event.currentTarget, () => {
-                this.showSheetCards(this.pickedSubject).then(() => {
+              this.doTransition(event.currentTarget, async () => {
+                return this.showSheetCards(this.pickedSubject).then(() => {
                   this.bindButtons();
                 });
               });
@@ -115,9 +115,10 @@ class QuizPicker {
             this.pickedMode = undefined;
             this.doTransition(
               event.currentTarget,
-              () => {
-                this.showTypeCards();
-                this.bindButtons();
+              async () => {
+                return this.showTypeCards().then(() => {
+                  this.bindButtons();
+                });
               },
               true
             );
@@ -136,7 +137,7 @@ class QuizPicker {
     $("div.category").unbind("click")
   }
 
-  showTypeCards() {
+  async showTypeCards() {
     let htmlToAdd = "";
     [
       { id: 0, content: "wróć" },
@@ -207,7 +208,7 @@ class QuizPicker {
     );
   }
 
-  doTransition(clicked, updateFunction, revert = false) {
+  async doTransition(clicked, updateFunction, revert = false) {
     this.unBindButtons();
     $(clicked).addClass("clicked");
     setTimeout(() => {
@@ -220,12 +221,13 @@ class QuizPicker {
             height: "easeOutBounce"
           },
           complete: () => {
-            updateFunction();
-            $("div.category-content").css("left", revert ? "-100%" : "100%");
-            $("div.category-content").animate(
-              { display: "flex", left: "0%" },
-              200
-            );
+            updateFunction().then(() => {
+              $("div.category-content").css("left", revert ? "-100%" : "100%");
+              $("div.category-content").animate(
+                { display: "flex", left: "0%" },
+                200
+              );
+            });
           }
         }
       );
