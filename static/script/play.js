@@ -247,13 +247,13 @@ class QuestionSoundPlayer {
         let offset = progressBarHandler.offsetLeft;
         let progressWidth = progressBarHandler.clientWidth;
         let clientX = clickEvent.x;
-        return ((clientX - offset) / progressWidth);
+        return (clientX - offset) / progressWidth;
     }
 
     bindProgressbarClick() {
         this.progressBar.parent().click((event) => {
             let percent = this._calculateAudioPercent(event.originalEvent);
-            this.audioObject.currentTime = this.audioObject.duration * percent
+            this.audioObject.currentTime = this.audioObject.duration * percent;
         });
     }
 
@@ -261,7 +261,7 @@ class QuestionSoundPlayer {
         this.audioObject.addEventListener("ended", (event) => {
             this._stopped = true;
             this.playButton.attr("src", this._playImg);
-         });
+        });
     }
 }
 class Play {
