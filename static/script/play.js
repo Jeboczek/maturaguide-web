@@ -16,7 +16,8 @@ class ExcerciseContent {
         this.type = json["type"];
     }
 
-    getContent() {
+    getContent(answers, questionId) {
+        let checkedInThisExcercise = answers.getAnswer(parseInt(questionId), this.id);
         let html = `<div class="answer">`;
         html += `<h1>${this.content}</h1>`;
         if (this.more_text !== null) {
@@ -29,7 +30,7 @@ class ExcerciseContent {
                 html += "<ul>";
                 html += "<li>";
                 this.answers.forEach((ans) => {
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle">${ans.index}</div>`;
+                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null && checkedInThisExcercise == ans.index ? "selected" : ""}">${ans.index}</div>`;
                 });
                 html += "</li>";
                 html += "</ul>";
@@ -38,7 +39,7 @@ class ExcerciseContent {
                 html += "<ul>";
                 this.answers.forEach((ans) => {
                     html += "<li>";
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle">${ans.index}</div> ${ans.content}`;
+                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null && checkedInThisExcercise == ans.index ? "selected" : ""}">${ans.index}</div> ${ans.content}`;
                     html += "<li>";
                 });
                 html += "</ul>";
@@ -90,7 +91,7 @@ class Excercise {
         return html;
     }
 
-    getContent() {
+    getContent(answers, questionId) {
         let html = "";
         html +=
             this.header === undefined
@@ -111,14 +112,15 @@ class Excercise {
                 : `<p id="more-text">${this.more_text.replace(/\n/g, "<br>")}</p>`;
 
         this.excercise_contents.forEach((ec) => {
-            html += ec.getContent();
+            html += ec.getContent(answers, questionId);
         });
         return html;
     }
 }
 
 class Question {
-    constructor(title = "", content = "", category = "") {
+    constructor(id = 0, title = "", content = "", category = "") {
+        this.id = id;
         this.title = title;
         this.category = category;
         this.content = content;
@@ -126,6 +128,7 @@ class Question {
     }
 
     fromJson(json) {
+        this.id = json["id"];
         this.title = json["title"];
         this.category = json["category"];
         this.content = json["content"];
@@ -142,8 +145,8 @@ class Question {
         return html;
     }
 
-    getContent() {
-        return this.excercise.getContent();
+    getContent(answers) {
+        return this.excercise.getContent(answers, this.id);
     }
 }
 
@@ -193,7 +196,7 @@ class Play {
     renderActualQuestion() {
         let questionToRender = this.questionArray[this.actualQuestion];
         $("div#play-content-header").html(questionToRender.getHeader());
-        $("div#play-content-article").html(questionToRender.getContent());
+        $("div#play-content-article").html(questionToRender.getContent(this.answers));
         this.attachAnswerButtons();
     }
 
@@ -221,18 +224,19 @@ class Play {
 
     attachAnswerButtons() {
         $("div.answer ul li").click((event) => {
-            let target =  event.target.className == "answer-circle" ? event.target : $(event.currentTarget).find("div.answer-circle").length == 1 ? $(event.currentTarget).find("div.answer-circle")[0] : null
+            let target =  event.target.className == "answer-circle " ? event.target : $(event.currentTarget).find("div.answer-circle").length == 1 ? $(event.currentTarget).find("div.answer-circle")[0] : null
             if (target === null) {
                 return
             }
+            let questionId = this.questionArray[this.actualQuestion]["id"]
             let answerId =  parseInt(target.id.split("-")[0]);
             let newAnswer = target.id.split("-")[1];
-            let oldAnswer = this.answers.getAnswer(parseInt(this.actualQuestion) + 1, answerId)
+            let oldAnswer = this.answers.getAnswer(questionId, answerId)
 
             if (oldAnswer == newAnswer){
                 return
             }else{
-                this.answers.selectAnswer(parseInt(this.actualQuestion) + 1, answerId, newAnswer)
+                this.answers.selectAnswer(questionId, answerId, newAnswer)
                 $(event.currentTarget).parent().find(".selected").removeClass("selected")
                 $(target).addClass("selected")
             }
