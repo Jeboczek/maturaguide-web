@@ -108,7 +108,9 @@ class Excercise(models.Model):
         return content
 
     def __str__(self) -> str:
-        return f"[{self.id}] {self.header[:50]}"
+        connection = Question.objects.filter(excercise = self).first()
+        connection = f"question id={connection.id}" if connection != None else ""
+        return f"[{self.id}] [{connection}] {self.header[:50]}"
 
     def get_as_object(self, question_nr) -> dict:
         return {
@@ -141,7 +143,7 @@ class Question(models.Model):
     excercise = ForeignKey(Excercise, null=True, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f"[{self.id}] {self.content[:50]}"
+        return f"[{self.id}] [{self.subject.subject_type}{self.subject.name}] [{self.cke_year}] {self.content[:50]}"
 
     def get_as_object(self, question_nr="") -> dict:
         return {
