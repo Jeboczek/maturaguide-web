@@ -69,7 +69,7 @@ class MaturaGuideAPIViews:
         else:
             category = None
 
-        year = 0 if request.GET.get("year") is None else request.GET.get("year")
+        year = 0 if request.GET.get("cke_year") is None else request.GET.get("cke_year")
 
         return JsonResponse(quiz_generator(excercise, year, question_category = category), safe=False)
 

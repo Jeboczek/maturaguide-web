@@ -11,7 +11,7 @@ def quiz_generator(subject : Subject, year=0, question_limit=15, question_catego
         # Shuffle questions
         questions = sorted(questions, key=lambda x: random.random())
     else:
-        questions = Question.objects.filter(year=year, subject=subject)
+        questions = Question.objects.filter(cke_year=year, subject=subject)
         question_limit = questions.count()
         # Sort all question by cke_order
         questions = sorted(questions, key = lambda x: x.cke_order)
