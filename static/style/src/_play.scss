@@ -19,28 +19,24 @@ div#play{
         &-header{
             height: 120px;
             width: 100%;
-            border-left-width: 30px;
-            border-left-style: solid;
-            border-color: $scrollBarText;
 
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
 
-            h1, h6{
-                margin: 0;
-                padding: 0;
-            }
 
-            h1{
-                font-weight: normal;
-            }
+            div.play-nav-progress-bar{
+                width: 80%;
+                height: 40px;
+                background-color: $mainColorLighter;
 
-            h6{
-                font-weight: 300;
-                font-size: 10pt;
-                color: $mainColorDarker;
+                div#play-nav-progress{
+                    width: 50%;
+                    height: 100%;
+                    background-color: $mainColorDarker;
+                    transition: 0.5s width;
+                }
             }
         }
 
@@ -273,7 +269,7 @@ div.sound-play-holder{
             height: 100%;
             background-color: $mainColorDarker;
             border-radius: 10px;
-            
+            transition: 0.2s width;
         }
     }
 
@@ -283,6 +279,11 @@ div.sound-play-holder{
     div#play{
         width: 100%;
         flex-wrap: wrap;
+
+        button{
+            width: 100%;
+            min-height: 50px;
+        }
     }
 
     div#play-nav{

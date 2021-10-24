@@ -365,6 +365,7 @@ class Play {
         }
         this.attachNextAndCheckButtons();
         this.showExplanations();
+        this.refreshNavBarProgress();
     }
 
     async refreshNavBar() {
@@ -381,6 +382,17 @@ class Play {
                 .animate({ opacity: "0", opacity: "1" }, 50)
                 .promise();
         }
+    }
+
+    refreshNavBarProgress(){
+        let values = $.map(this.answers.submittedQuestions, (v, k) => {return v});
+        console.log(values)
+        let submitted = 0;
+        values.forEach((val) => {
+            submitted += val === false ? 0 : 1;
+        })
+        console.log(submitted)
+        $("div#play-nav-progress").css("width", `${submitted / values.length * 100}%`)
     }
 
     attachNavButton() {
