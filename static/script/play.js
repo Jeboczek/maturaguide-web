@@ -16,7 +16,24 @@ class ExcerciseContent {
         this.correct = json["correct"];
         this.more_text = json["more_text"];
         this.type = json["type"];
-        this.explanationContent = json["explanation"] === null ? null : json["explanation"]["content"]
+        this.explanationContent =
+            json["explanation"] === null ? null : json["explanation"]["content"];
+    }
+
+    _getCheckedClass(checkedInThisExcercise, correct, submitted, answer) {
+        if (checkedInThisExcercise !== null) {
+            if (submitted) {
+                if (checkedInThisExcercise == answer.index) {
+                    return answer.index == correct ? "selected" : "wrong";
+                } else {
+                    return answer.index == correct ? "selected" : "";
+                }
+            } else {
+                return checkedInThisExcercise == answer.index ? "selected" : "";
+            }
+        } else {
+            return submitted && answer.index == correct ? "selected" : "";
+        }
     }
 
     getContent(answers, questionId) {
@@ -36,11 +53,13 @@ class ExcerciseContent {
                 html += "<ul>";
                 html += "<li>";
                 this.answers.forEach((ans) => {
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null &&
-                            checkedInThisExcercise == ans.index
-                            ? "selected"
-                            : ""
-                        }">${ans.index}</div>`;
+                    html += `<div id="${this.id}-${ans.index
+                        }" class="answer-circle ${this._getCheckedClass(
+                            checkedInThisExcercise,
+                            answers.getCorrectAnswer(questionId, this.id),
+                            answers.isQuestionSubmitted(questionId),
+                            ans
+                        )}">${ans.index}</div>`;
                 });
                 html += "</li>";
                 html += "</ul>";
@@ -49,11 +68,13 @@ class ExcerciseContent {
                 html += "<ul>";
                 this.answers.forEach((ans) => {
                     html += "<li>";
-                    html += `<div id="${this.id}-${ans.index}" class="answer-circle ${checkedInThisExcercise !== null &&
-                            checkedInThisExcercise == ans.index
-                            ? "selected"
-                            : ""
-                        }">${ans.index}</div> ${ans.content}`;
+                    html += `<div id="${this.id}-${ans.index
+                        }" class="answer-circle ${this._getCheckedClass(
+                            checkedInThisExcercise,
+                            answers.getCorrectAnswer(questionId, this.id),
+                            answers.isQuestionSubmitted(questionId),
+                            ans
+                        )}">${ans.index}</div> ${ans.content}`;
                     html += "<li>";
                 });
                 html += "</ul>";
@@ -63,11 +84,11 @@ class ExcerciseContent {
                 break;
         }
         html += "</div>";
-        if (answers.isQuestionSubmitted(questionId)) {
+        if (answers.isQuestionSubmitted(questionId) && this.explanationContent !== null) {
             html += `<div class="explanation">`;
 
-            html += `<h3>Wyjaśnienie</h3>`
-            html += `<p>${this.explanationContent.replace(/\n/g, "<br>")}</p>`
+            html += `<h3>Wyjaśnienie</h3>`;
+            html += `<p>${this.explanationContent.replace(/\n/g, "<br>")}</p>`;
 
             html += "</div>";
         }
@@ -108,8 +129,8 @@ class Excercise {
 
     getHeader() {
         let html = "";
-        if (this.img !== null){
-            html += `<img class="excercise-img" src="${this.img}">`
+        if (this.img !== null) {
+            html += `<img class="excercise-img" src="${this.img}">`;
         }
         if (this.audio !== null) {
             html += `<div class="sound-play-holder">
@@ -178,10 +199,12 @@ class Question {
 
     getContent(answers, lastQuestionIndex) {
         let html = this.excercise.getContent(answers, this.id);
-        if (lastQuestionIndex == this.id) {
-            html += "<button id=\"exit-button\">Koniec</button>";
-        }else{
-            html += answers.isQuestionSubmitted(this.id) ? `<button id="next-button">Dalej</button>` : `<button id="check-button">Sprawdź</button>`;
+        if (answers.isQuestionSubmitted(this.id) && lastQuestionIndex == this.id) {
+            html += '<button id="exit-button">Koniec</button>';
+        } else {
+            html += answers.isQuestionSubmitted(this.id)
+                ? `<button id="next-button">Dalej</button>`
+                : `<button id="check-button">Sprawdź</button>`;
         }
         return html;
     }
@@ -198,7 +221,7 @@ class PlayResult {
         json.forEach((question) => {
             this.answerAndCorrect[question["id"]] = {};
             this.checkedAnswers[question["id"]] = {};
-            this.submittedQuestions[question["id"]] = false
+            this.submittedQuestions[question["id"]] = false;
             question["excercise"]["excercise_contents"].forEach(
                 (excerciseContent) => {
                     this.answerAndCorrect[question["id"]][excerciseContent["id"]] =
@@ -217,11 +240,15 @@ class PlayResult {
         this.checkedAnswers[questionId][answerId] = buttonIndex;
     }
 
+    getCorrectAnswer(questionId, answerID) {
+        return this.answerAndCorrect[questionId][answerID];
+    }
+
     submitQuestion(questionId) {
         this.submittedQuestions[questionId] = true;
     }
 
-    isQuestionSubmitted(questionId){
+    isQuestionSubmitted(questionId) {
         return this.submittedQuestions[questionId];
     }
 }
@@ -239,7 +266,7 @@ class QuestionSoundPlayer {
         this.bindAll();
     }
 
-    stop(){
+    stop() {
         this.audioObject.pause();
         this.audioObject.currentTime = 0;
     }
@@ -329,7 +356,11 @@ class Play {
         if (audioFile !== null) {
             this.actualQuestionSound = new QuestionSoundPlayer(audioFile);
         }
-        if (!this.answers.isQuestionSubmitted(this.questionArray[this.actualQuestion]["id"])) {
+        if (
+            !this.answers.isQuestionSubmitted(
+                this.questionArray[this.actualQuestion]["id"]
+            )
+        ) {
             this.attachAnswerButtons();
         }
         this.attachNextAndCheckButtons();
@@ -386,22 +417,33 @@ class Play {
         });
     }
 
-    attachNextAndCheckButtons(){
+    attachNextAndCheckButtons() {
         $("button#check-button").click(() => {
-            this.answers.submitQuestion(this.questionArray[this.actualQuestion]["id"]);
+            this.answers.submitQuestion(
+                this.questionArray[this.actualQuestion]["id"]
+            );
             this.renderActualQuestion();
-        })
+            this.highlightActiveLink();
+        });
         $("button#next-button").click(() => {
             this.actualQuestion = parseInt(this.actualQuestion) + 1;
             this.renderActualQuestion();
             this.highlightActiveLink();
-        })
+        });
         $("button#exit-button").click(() => {
             window.location.href = "/#learn";
-        })
+        });
     }
 
     highlightActiveLink() {
+        $("ul#question-links li").each((i, element) => {
+            let questionId = this.questionArray[element.id.replace("q-", "")]["id"];
+            let submited = this.answers.isQuestionSubmitted(questionId);
+            if (submited) {
+                $(element).addClass("submited");
+            }
+        });
+
         $("ul#question-links li.active").removeClass("active");
         $(`ul#question-links li#q-${this.actualQuestion}`).addClass("active");
     }

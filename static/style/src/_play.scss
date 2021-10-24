@@ -58,6 +58,8 @@ div#play{
                     margin-bottom: 35px;
                     cursor: pointer;
 
+                    user-select: none;
+
                     transition: 0.2s opacity;
 
                     &:hover{
@@ -66,6 +68,10 @@ div#play{
 
                     &.active{
                         font-weight: bold;
+                    }
+
+                    &.submited{
+                        color: $mainColorDarker;
                     }
                 }
             }
@@ -162,6 +168,7 @@ div#play{
                         flex-direction: row;
                         color: $darkFontSize;
                         font-size: 14pt;
+                        margin-bottom: 5px;
                         cursor: pointer;
                         width: max-content;
 
