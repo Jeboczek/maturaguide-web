@@ -364,6 +364,7 @@ class Play {
             this.attachAnswerButtons();
         }
         this.attachNextAndCheckButtons();
+        this.showExplanations();
     }
 
     async refreshNavBar() {
@@ -478,6 +479,14 @@ class Play {
         this.lastQuestionIndex = this.questionArray.at(-1)["id"];
 
         this.start();
+    }
+
+    async showExplanations(){
+        let explanations = $("div.explanation")
+        for (let i = 0; i < explanations.length; i++) {
+            await $(explanations[i]).find("h3").animate({"opacity": 0, "opacity": 1}, 500)           
+            await $(explanations[i]).find("p").animate({"opacity": 0, "opacity": 1}, 700)           
+        }
     }
 
     makeAPIQuerry() {
