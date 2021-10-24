@@ -386,12 +386,10 @@ class Play {
 
     refreshNavBarProgress(){
         let values = $.map(this.answers.submittedQuestions, (v, k) => {return v});
-        console.log(values)
         let submitted = 0;
         values.forEach((val) => {
             submitted += val === false ? 0 : 1;
         })
-        console.log(submitted)
         $("div#play-nav-progress").css("width", `${submitted / values.length * 100}%`)
     }
 
