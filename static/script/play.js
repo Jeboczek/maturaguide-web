@@ -1,3 +1,5 @@
+// Keep all classes in one file to increase page speed by optimizing http requests
+
 class ExcerciseContent {
     constructor(id = 0, content = "", answers = [], correct = "", type = 1) {
         this.id = id;
@@ -176,8 +178,6 @@ class Question {
 
     getContent(answers, lastQuestionIndex) {
         let html = this.excercise.getContent(answers, this.id);
-        console.log(lastQuestionIndex)
-        console.log(this.id)
         if (lastQuestionIndex == this.id) {
             html += "<button id=\"exit-button\">Koniec</button>";
         }else{
@@ -360,7 +360,7 @@ class Play {
     attachAnswerButtons() {
         $("div.answer ul li").click((event) => {
             let target =
-                event.target.className == "answer-circle "
+                event.target.className.trim() == "answer-circle"
                     ? event.target
                     : $(event.currentTarget).find("div.answer-circle").length == 1
                         ? $(event.currentTarget).find("div.answer-circle")[0]
